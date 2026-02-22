@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { usePage, router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaCreditCard, FaCheckCircle, FaExclamationCircle, FaLock } from 'react-icons/fa';
 import { colors } from '../../constants/colors';
@@ -98,7 +98,7 @@ const Payment = ({ plan: planProp }) => {
       setSuccess(t('payment.success'));
       if (!isEmbedded) {
         setTimeout(() => {
-          navigate('/account');
+          router.visit('/account');
         }, 2000);
       }
     }, 2000);

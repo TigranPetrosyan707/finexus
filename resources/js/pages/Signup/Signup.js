@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -27,7 +27,7 @@ const SIGNUP_STORAGE_KEY = 'signup_form_data';
 
 const Signup = () => {
   const { t, i18n } = useTranslation();
-  const location = useLocation();
+  const { url } = usePage();
   const {
     loading,
     selectedRole,
@@ -148,10 +148,10 @@ const Signup = () => {
   }, [selectedRole, currentStep, allFormValues, isInitialLoad]);
 
   useEffect(() => {
-    if (location.pathname !== '/signup') {
+    if (url !== '/signup') {
       sessionStorage.removeItem(SIGNUP_STORAGE_KEY);
     }
-  }, [location.pathname]);
+  }, [url]);
 
   useEffect(() => {
     return () => {

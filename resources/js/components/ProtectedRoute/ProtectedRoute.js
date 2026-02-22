@@ -1,11 +1,18 @@
-import { Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { router } from '@inertiajs/react';
 import { useAuth } from '../../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.visit('/login', { replace: true });
+    }
+  }, [isAuthenticated]);
+
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return null;
   }
 
   return children;

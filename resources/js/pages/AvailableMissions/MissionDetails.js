@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaEuroSign, FaClock, FaMapMarkerAlt, FaCalendarAlt, FaArrowLeft, FaBriefcase } from 'react-icons/fa';
 import { colors } from '../../constants/colors';
@@ -7,9 +7,7 @@ import Button from '../../components/UI/Button/Button';
 import { formatMissionDate, getSectorOptions } from '../PostMission/utils';
 import { availableMissionsDB } from './db';
 
-const MissionDetails = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+const MissionDetails = ({ id }) => {
   const { t, i18n } = useTranslation();
   const [mission, setMission] = useState(null);
   const [companyMissions, setCompanyMissions] = useState([]);
@@ -49,7 +47,7 @@ const MissionDetails = () => {
           <div className="text-center py-16">
             <p className="text-gray-600">{t('availableMissions.missionNotFound') || 'Mission not found'}</p>
             <Button
-              onClick={() => navigate('/available-missions')}
+              onClick={() => router.visit('/available-missions')}
               className="mt-4"
               style={{ backgroundColor: colors.linkHover, color: '#fff' }}
             >
@@ -198,7 +196,7 @@ const MissionDetails = () => {
                   {companyMissions.map((otherMission) => (
                     <div
                       key={otherMission.id}
-                      onClick={() => navigate(`/available-missions/${otherMission.id}`)}
+                      onClick={() => router.visit(`/available-missions/${otherMission.id}`)}
                       className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all cursor-pointer"
                     >
                       <h3 className="font-semibold text-gray-900 mb-2">{otherMission.title}</h3>

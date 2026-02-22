@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { FaBriefcase } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
 import Empty from '../../../components/Empty/Empty';
@@ -60,7 +60,7 @@ const RecentMissions = ({ missions, t }) => {
                     {t(`missions.status.${assignedMission.status}`)}
                   </span>
                 </span>
-                <Link to="/missions" className="text-sm" style={{ color: colors.linkHover }}>
+                <Link href="/missions" className="text-sm" style={{ color: colors.linkHover }}>
                   {t('dashboard.expert.viewDetails')} →
                 </Link>
               </div>

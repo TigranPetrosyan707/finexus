@@ -1,14 +1,12 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePage } from '@inertiajs/react';
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { url } = usePage();
 
   useEffect(() => {
-    // Instant scroll to top on route change to prevent layout shift
-    // The scroll happens immediately when route changes, before content loads
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [url]);
 
   return null;
 };

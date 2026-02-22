@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaEnvelope, FaArrowLeft } from 'react-icons/fa';
 import { colors } from '../../constants/colors';
@@ -77,7 +77,7 @@ const ForgotPassword = () => {
 
           <div className="mt-6 text-center">
             <Link
-              to="/login"
+              href="/login"
               className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               <FaArrowLeft className="w-4 h-4 mr-2" />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaGift, FaCheckCircle } from 'react-icons/fa';
 import Input from '../../components/UI/Input/Input';
@@ -136,7 +136,7 @@ const Trial = () => {
             <p className="mt-6 text-center text-gray-600">
               {t('trial.hasAccount')}{' '}
               <Link
-                to="/login"
+                href="/login"
                 className="font-bold transition-colors hover:opacity-80"
                 style={{ color: '#28c76f' }}
               >

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { FaChartLine, FaCheckCircle, FaBriefcase, FaStar, FaUser } from 'react-icons/fa';
 import {
   Chart as ChartJS,
@@ -211,13 +211,13 @@ const Dashboard = () => {
                   {t('dashboard.expert.quickActions')}
                 </h2>
                 <div className="space-y-3">
-                  <Link to="/available-missions" className="block p-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
+                  <Link href="/available-missions" className="block p-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
                     <div className="flex items-center space-x-3">
                       <FaBriefcase className="w-5 h-5" style={{ color: colors.linkHover }} />
                       <span className="font-semibold text-gray-900">{t('dashboard.expert.browseMissions')}</span>
                     </div>
                   </Link>
-                  <Link to="/expert-profile" className="block p-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
+                  <Link href="/expert-profile" className="block p-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
                     <div className="flex items-center space-x-3">
                       <FaUser className="w-5 h-5" style={{ color: colors.linkHover }} />
                       <span className="font-semibold text-gray-900">{t('dashboard.expert.editProfile')}</span>

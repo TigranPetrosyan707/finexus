@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { router, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaUserPlus } from 'react-icons/fa';
 import { colors } from '../../constants/colors';
@@ -10,9 +10,7 @@ import ProfileInfo from '../ExpertProfile/components/ProfileInfo';
 import SelectMissionModal from './components/SelectMissionModal';
 import Button from '../../components/UI/Button/Button';
 
-const ExpertDetails = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+const ExpertDetails = ({ id }) => {
   const { t, i18n } = useTranslation();
   const { profile, loading } = useExpertDetails(id, t);
   const {
@@ -71,7 +69,7 @@ const ExpertDetails = () => {
           <div className="text-center py-16">
             <p className="text-gray-600 mb-4">{t('expertDetails.notFound') || 'Expert not found'}</p>
             <Button
-              onClick={() => navigate('/search-experts')}
+              onClick={() => router.visit('/search-experts')}
               style={{ backgroundColor: colors.linkHover, color: '#fff' }}
             >
               {t('expertDetails.backToSearch') || 'Back to Search Experts'}

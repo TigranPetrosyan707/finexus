@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaEuroSign, FaClock, FaMapMarkerAlt, FaCalendarAlt, FaArrowLeft, FaBriefcase } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
@@ -7,9 +7,7 @@ import Button from '../../../components/UI/Button/Button';
 import { formatMissionDate, getSectorOptions } from '../../PostMission/utils';
 import { availableMissionsDB } from '../../AvailableMissions/db';
 
-const MissionViewFromRequest = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+const MissionViewFromRequest = ({ id }) => {
   const { t, i18n } = useTranslation();
   const [mission, setMission] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +51,7 @@ const MissionViewFromRequest = () => {
           <div className="text-center py-16">
             <p className="text-gray-600 mb-4">{t('missions.missionNotFound') || 'Mission not found'}</p>
             <Button
-              onClick={() => navigate('/missions')}
+              onClick={() => router.visit('/missions')}
               style={{ backgroundColor: colors.linkHover, color: '#fff' }}
             >
               {t('missions.backToMissions') || 'Back to Missions'}

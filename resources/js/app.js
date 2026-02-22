@@ -2,10 +2,8 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 
-// Create Inertia app
 createInertiaApp({
     resolve: (name) => {
-        // Import all pages from ./pages folder with .js extension
         const pages = import.meta.glob("./pages/**/*.js", { eager: true });
 
         const page = pages[`./pages/${name}.js`];
@@ -16,10 +14,9 @@ createInertiaApp({
             );
         }
 
-        return page.default; // must return default export
+        return page.default;
     },
     setup({ el, App, props }) {
-        // Render Inertia App into DOM
         createRoot(el).render(React.createElement(App, props));
     },
 });

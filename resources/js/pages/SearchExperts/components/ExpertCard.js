@@ -1,12 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { FaStar, FaBriefcase, FaCheckCircle, FaEuroSign } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
 import Button from '../../../components/UI/Button/Button';
 
 const ExpertCard = ({ expert, t }) => {
-  const navigate = useNavigate();
-  
   const initials = expert.name
     .split(' ')
     .map(n => n[0])
@@ -15,7 +13,7 @@ const ExpertCard = ({ expert, t }) => {
     .slice(0, 2);
 
   const handleViewProfile = () => {
-    navigate(`/expert/${expert.id}`);
+    router.visit(`/expert/${expert.id}`);
   };
 
   return (

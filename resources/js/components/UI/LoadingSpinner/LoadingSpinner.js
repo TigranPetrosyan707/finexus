@@ -4,7 +4,6 @@ import { colors } from '../../../constants/colors';
 const LoadingSpinner = ({ fullScreen = true }) => {
   useEffect(() => {
     if (fullScreen) {
-      // Prevent scrolling when spinner is shown
       document.body.style.overflow = 'hidden';
       return () => {
         document.body.style.overflow = '';

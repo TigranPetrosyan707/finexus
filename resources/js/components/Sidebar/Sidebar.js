@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, usePage, router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
@@ -14,9 +14,8 @@ const Sidebar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { isCollapsed, setIsCollapsed } = useSidebar();
-  const location = useLocation();
+  const { url } = usePage();
   const { logout, userRole } = useAuth();
-  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const {
     languages,
@@ -48,14 +47,13 @@ const Sidebar = () => {
     { path: '/chat', labelKey: 'common.chat', icon: HiChat },
     { path: '/expert-profile', labelKey: 'common.myProfile', icon: HiIdentification },
     { path: '/account', labelKey: 'common.account', icon: HiUser },
-    // { path: '/subscription', labelKey: 'common.subscription', icon: HiStar },
   ];
 
   const menuItems = userRole === 'expert' ? expertMenuItems : companyMenuItems;
 
 
   const isActive = (path) => {
-    return location.pathname === path;
+    return url === path;
   };
 
   const handleLogoutClick = () => {
@@ -64,7 +62,7 @@ const Sidebar = () => {
 
   const handleLogoutConfirm = () => {
     logout();
-    navigate('/login');
+    router.visit('/login');
     setShowLogoutModal(false);
   };
 
@@ -78,7 +76,7 @@ const Sidebar = () => {
     
     return (
       <Link
-        to={item.path}
+        href={item.path}
         onClick={onClick}
         className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-4 py-3 rounded-lg transition-all duration-200 ${
           active
@@ -99,7 +97,7 @@ const Sidebar = () => {
   return (
     <>
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between" style={{ backgroundColor: colors.footerBackground }}>
-        <Link to={defaultPath} className="cursor-pointer">
+        <Link href={defaultPath} className="cursor-pointer">
           <Logo showText={true} variant="light" />
         </Link>
         <button
@@ -119,7 +117,7 @@ const Sidebar = () => {
       >
         <div className="flex flex-col h-full relative">
           <div className="flex items-center justify-between p-4 lg:hidden">
-            <Link to={defaultPath} className="cursor-pointer">
+            <Link href={defaultPath} className="cursor-pointer">
               <Logo showText={true} variant="light" />
             </Link>
             <button
@@ -131,7 +129,7 @@ const Sidebar = () => {
           </div>
 
           <div className="hidden lg:flex items-center p-6">
-            <Link to={defaultPath} className="cursor-pointer">
+            <Link href={defaultPath} className="cursor-pointer">
               <Logo showText={!isCollapsed} variant="light" />
             </Link>
           </div>

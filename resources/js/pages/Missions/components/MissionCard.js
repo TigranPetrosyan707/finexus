@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { FaClock, FaEuroSign, FaCheckCircle, FaUser, FaBuilding, FaEye, FaTimes, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
 import Button from '../../../components/UI/Button/Button';
@@ -11,7 +11,6 @@ import { db } from '../../../utils/database';
 import toast from 'react-hot-toast';
 
 const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => {
-  const navigate = useNavigate();
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showRejectionReasonModal, setShowRejectionReasonModal] = useState(false);
   const [showApplicationRejectModal, setShowApplicationRejectModal] = useState(false);
@@ -27,7 +26,7 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
 
   const handleViewMission = () => {
     if (assignedMission.missionId) {
-      navigate(`/missions/view/${assignedMission.missionId}`);
+      router.visit(`/missions/view/${assignedMission.missionId}`);
     }
   };
 

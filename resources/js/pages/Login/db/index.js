@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { useAuth } from '../../../context/AuthContext';
 import { userDB, db } from '../../../utils/database';
 import { LOGIN_ERRORS } from '../constants';
@@ -22,7 +22,6 @@ export const useLoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogin = async (data, setFormError, t) => {
     if (!selectedRole) {
@@ -64,7 +63,7 @@ export const useLoginForm = () => {
 
       await loginDB.saveCurrentUser(user);
       login(selectedRole);
-      navigate('/');
+      router.visit('/');
     } catch (err) {
       console.error('Login error:', err);
       setFormError('root', {

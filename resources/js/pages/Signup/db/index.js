@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { useAuth } from '../../../context/AuthContext';
 import { userDB, db } from '../../../utils/database';
 import { SIGNUP_ERRORS } from '../constants';
@@ -22,7 +22,6 @@ export const useSignupForm = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleNext = async (data, trigger, setFormError, t) => {
     setFormError('root', { message: '' });
@@ -98,7 +97,7 @@ export const useSignupForm = () => {
       const newUser = await signupDB.createUser(selectedRole, data);
       await db.set('currentUser', newUser);
       login(selectedRole);
-      navigate('/');
+      router.visit('/');
     } catch (err) {
       console.error('Signup error:', err);
       setFormError('root', {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -187,7 +187,7 @@ const Login = () => {
             <p className="text-center text-gray-600">
               {t('login.noAccount')}{' '}
               <Link
-                to="/signup"
+                href="/signup"
                 className="font-bold transition-colors hover:opacity-80"
                 style={{ color: colors.buttonBackground }}
               >
@@ -196,7 +196,7 @@ const Login = () => {
             </p>
             <p className="text-center">
               <Link
-                to="/forgot-password"
+                href="/forgot-password"
                 className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
               >
                 {t('login.forgotPassword')}

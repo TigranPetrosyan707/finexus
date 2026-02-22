@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { FaUpload, FaFileCsv, FaFileInvoice } from 'react-icons/fa';
 import { colors } from '../../constants/colors';
 import Button from '../../components/UI/Button/Button';
@@ -17,8 +17,14 @@ const Invoices = () => {
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, invoiceId: null });
   const fileInputRef = useRef(null);
 
+  useEffect(() => {
+    if (userRole !== 'company') {
+      router.visit('/search-experts', { replace: true });
+    }
+  }, [userRole]);
+
   if (userRole !== 'company') {
-    return <Navigate to="/search-experts" replace />;
+    return null;
   }
 
   const handleFileUpload = async (event) => {

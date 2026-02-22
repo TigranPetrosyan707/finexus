@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { useAuth } from '../../../context/AuthContext';
 import { FaEuroSign, FaClock, FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
@@ -8,7 +8,6 @@ import { formatMissionDate, getSectorOptions } from '../../PostMission/utils';
 import { useApplicationRequest } from '../../HireRequests/hooks/useApplicationRequest';
 
 const MissionCard = ({ mission, t, i18n }) => {
-  const navigate = useNavigate();
   const { userRole } = useAuth();
   const {
     hasPendingApplication,
@@ -144,7 +143,7 @@ const MissionCard = ({ mission, t, i18n }) => {
           <Button 
             variant="secondary" 
             className="w-full"
-            onClick={() => navigate(`/available-missions/${mission.id}`)}
+            onClick={() => router.visit(`/available-missions/${mission.id}`)}
           >
             {t('availableMissions.viewDetails')}
           </Button>

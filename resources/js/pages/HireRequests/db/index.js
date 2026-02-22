@@ -47,7 +47,6 @@ export const hireRequestsDB = {
 
   async createHireRequest(companyId, expertId, missionId) {
     const requests = await db.get('hireRequests') || [];
-    // Check if there's already a request for this specific mission
     const existingRequest = await this.getHireRequestByCompanyExpertAndMission(companyId, expertId, missionId);
     
     if (existingRequest) {
