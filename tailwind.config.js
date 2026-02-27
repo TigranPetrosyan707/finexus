@@ -3,6 +3,7 @@ module.exports = {
     "./resources/**/*.blade.php",
     "./resources/**/*.js",
     "./resources/**/*.jsx",
+    "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
     fontFamily: {
@@ -42,4 +43,3 @@ module.exports = {
   },
   plugins: [],
 }
-

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthPageController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
@@ -10,10 +11,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', fn() => Inertia::render('Login/Login'));
-    Route::get('/signup', fn() => Inertia::render('Signup/Signup'));
-    Route::get('/forgot-password', fn() => Inertia::render('ForgotPassword/ForgotPassword'));
-    Route::get('/trial', fn() => Inertia::render('Trial/Trial'));
+    Route::get('/login', [AuthPageController::class, 'login']);
+    Route::get('/signup', [AuthPageController::class, 'signup']);
+    Route::get('/forgot-password', [AuthPageController::class, 'forgotPassword']);
+    Route::get('/trial', [AuthPageController::class, 'trial']);
 });
 
 /*
@@ -25,7 +26,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', fn() => Inertia::render('Dashboard/Dashboard'));
-    Route::get('/documents', fn() => Inertia::render('Documents/Documents'));
+    Route::get('/documents', [DocumentsController::class, 'index']);
     Route::get('/account', fn() => Inertia::render('Account/Account'));
     Route::get('/search-experts', fn() => Inertia::render('SearchExperts/SearchExperts'));
     Route::get('/missions', fn() => Inertia::render('Missions/Missions'));

@@ -1,13 +1,114 @@
-@import 'tailwindcss';
-
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@import "tailwindcss";
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --color-footerBackground: #253033;
+  --color-buttonBackground: #ffcd04;
+  --color-buttonText: #131313;
+  --color-logoutRed-light: #fef2f2;
+  --color-logoutRed: #ef4444;
+  
+  --max-width-containerMedium: 56rem;
+  --max-width-containerLarge: 73rem;
+  
+  --z-index-header: 60;
+  --z-index-headerFixed: 100;
+  
+  --shadow-headerShadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  
+  --animate-headerShow: headerShow 0.3s ease-out;
+}
+
+/*@keyframes headerShow {*/
+/*  '0%': { transform: 'translateY(-100%)', opacity: '0' };*/
+/*  '100%': { transform: 'translateY(0)', opacity: '1' };*/
+/*}*/
+
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #72c2cb;
+  --rdp-background-color: #e8f4f8;
+  --rdp-accent-color-dark: #1a4d5c;
+  --rdp-background-color-dark: #1e3a8a;
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  --rdp-outline-selected: 3px solid var(--rdp-accent-color);
+  margin: 0;
+}
+
+.rdp-day_selected,
+.rdp-day_selected:focus-visible,
+.rdp-day_selected:hover {
+  background-color: #72c2cb;
+  color: white;
+}
+
+.rdp-day_today {
+  color: #72c2cb;
+  font-weight: bold;
+}
+
+@layer base {
+  * {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent layout shift during page transitions */
+    overflow-x: hidden;
+  }
+
+  html {
+    /* Smooth scrolling for better UX */
+    scroll-behavior: smooth;
+  }
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  monospace;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -38,46 +139,4 @@
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(114, 194, 203, 0.5) transparent;
-}
-
-.rdp {
-  --rdp-cell-size: 40px;
-  --rdp-accent-color: #72c2cb;
-  --rdp-background-color: #e8f4f8;
-  --rdp-accent-color-dark: #1a4d5c;
-  --rdp-background-color-dark: #1e3a8a;
-  --rdp-outline: 2px solid var(--rdp-accent-color);
-  --rdp-outline-selected: 3px solid var(--rdp-accent-color);
-  margin: 0;
-}
-
-.rdp-day_selected,
-.rdp-day_selected:focus-visible,
-.rdp-day_selected:hover {
-  background-color: #72c2cb;
-  color: white;
-}
-
-.rdp-day_today {
-  color: #72c2cb;
-  font-weight: bold;
-}
-
-* {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-body {
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
