@@ -1,62 +1,52 @@
 <?php
 
+use App\Http\Controllers\AccountPageController;
 use App\Http\Controllers\AuthPageController;
-use Inertia\Inertia;
+use App\Http\Controllers\AvailableMissionsPageController;
+use App\Http\Controllers\ChatPageController;
+use App\Http\Controllers\DashboardPageController;
+use App\Http\Controllers\DocumentsController;
+use App\Http\Controllers\ExpertDetailsPageController;
+use App\Http\Controllers\ExpertProfilePageController;
+use App\Http\Controllers\InvoicesPageController;
+use App\Http\Controllers\MissionCalendarPageController;
+use App\Http\Controllers\MissionsPageController;
+use App\Http\Controllers\MyExpertsPageController;
+use App\Http\Controllers\PostMissionPageController;
+use App\Http\Controllers\SearchExpertsPageController;
+use App\Http\Controllers\SubscriptionPageController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Guest routes
-|--------------------------------------------------------------------------
-*/
-
 Route::middleware('guest')->group(function () {
+
     Route::get('/login', [AuthPageController::class, 'login']);
     Route::get('/signup', [AuthPageController::class, 'signup']);
     Route::get('/forgot-password', [AuthPageController::class, 'forgotPassword']);
     Route::get('/trial', [AuthPageController::class, 'trial']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Auth routes
-|--------------------------------------------------------------------------
-*/
-
 Route::middleware('auth')->group(function () {
 
-    Route::get('/dashboard', fn() => Inertia::render('Dashboard/Dashboard'));
+    Route::get('/dashboard', [DashboardPageController::class, 'index']);
     Route::get('/documents', [DocumentsController::class, 'index']);
-    Route::get('/account', fn() => Inertia::render('Account/Account'));
-    Route::get('/search-experts', fn() => Inertia::render('SearchExperts/SearchExperts'));
-    Route::get('/missions', fn() => Inertia::render('Missions/Missions'));
-    Route::get('/missions/view/{id}', fn($id) =>
-        Inertia::render('Missions/components/MissionViewFromRequest', ['id'=>$id])
-    );
+    Route::get('/account', [AccountPageController::class, 'index']);
+    Route::get('/search-experts', [SearchExpertsPageController::class, 'index']);
+    Route::get('/missions', [MissionsPageController::class, 'index']);
+    Route::get('/missions/view/{id}', [MissionsPageController::class, 'viewFromRequest']);
 
-    Route::get('/my-experts', fn() => Inertia::render('MyExperts/MyExperts'));
-    Route::get('/post-mission', fn() => Inertia::render('PostMission/PostMission'));
-    Route::get('/chat', fn() => Inertia::render('Chat/Chat'));
-    Route::get('/expert-profile', fn() => Inertia::render('ExpertProfile/ExpertProfile'));
-    Route::get('/expert/{id}', fn($id) =>
-        Inertia::render('ExpertDetails/ExpertDetails', ['id'=>$id])
-    );
+    Route::get('/my-experts', [MyExpertsPageController::class, 'index']);
+    Route::get('/post-mission', [PostMissionPageController::class, 'index']);
+    Route::get('/chat', [ChatPageController::class, 'index']);
+    Route::get('/expert-profile', [ExpertProfilePageController::class, 'index']);
+    Route::get('/expert/{id}', [ExpertDetailsPageController::class, 'show']);
 
-    Route::get('/subscription', fn() => Inertia::render('Subscription/Subscription'));
-    Route::get('/available-missions', fn() => Inertia::render('AvailableMissions/AvailableMissions'));
-    Route::get('/available-missions/{id}', fn($id) =>
-        Inertia::render('AvailableMissions/MissionDetails', ['id'=>$id])
-    );
+    Route::get('/subscription', [SubscriptionPageController::class, 'index']);
+    Route::get('/available-missions', [AvailableMissionsPageController::class, 'index']);
+    Route::get('/available-missions/{id}', [AvailableMissionsPageController::class, 'show']);
 
-    Route::get('/invoices', fn() => Inertia::render('Invoices/Invoices'));
-    Route::get('/mission-calendar', fn() => Inertia::render('MissionCalendar/MissionCalendar'));
+    Route::get('/invoices', [InvoicesPageController::class, 'index']);
+    Route::get('/mission-calendar', [MissionCalendarPageController::class, 'index']);
 });
-
-/*
-|--------------------------------------------------------------------------
-| Root redirect (your "/" logic)
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/', function () {
     if (!auth()->check()) {
