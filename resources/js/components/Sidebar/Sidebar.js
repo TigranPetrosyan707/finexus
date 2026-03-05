@@ -15,7 +15,7 @@ const Sidebar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { isCollapsed, setIsCollapsed } = useSidebar();
   const { url } = usePage();
-  const { logout, userRole } = useAuth();
+  const { userRole } = useAuth();
   const { t, i18n } = useTranslation();
   const {
     languages,
@@ -61,9 +61,8 @@ const Sidebar = () => {
   };
 
   const handleLogoutConfirm = () => {
-    logout();
-    router.visit('/login');
     setShowLogoutModal(false);
+    router.post('/logout');
   };
 
   const handleLogoutCancel = () => {

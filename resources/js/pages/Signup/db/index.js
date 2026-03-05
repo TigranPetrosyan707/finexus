@@ -1,21 +1,65 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { useAuth } from '../../../context/AuthContext';
-import { userDB, db } from '../../../utils/database';
 import { SIGNUP_ERRORS } from '../constants';
-import { createUserSchema } from './schema';
 
-const signupDB = {
-  async createUser(role, formData) {
-    const structuredUserData = await createUserSchema(role, formData);
-    return await userDB.createUser(structuredUserData);
-  },
+const API_BASE = '';
 
-  async checkEmailExists(email, role) {
-    const user = await userDB.getUserByEmailAndRole(email, role);
-    return !!user;
-  },
-};
+function getCsrfToken() {
+  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+async function checkEmailExists(email, role) {
+  const res = await fetch(`${API_BASE}/users/check-email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-XSRF-TOKEN': getCsrfToken() || '',
+    },
+    body: JSON.stringify({ email, role }),
+    credentials: 'include',
+  });
+  const data = await res.json();
+  return data.exists === true;
+}
+
+function buildPayload(selectedRole, data) {
+  const payload = {
+    role: selectedRole,
+    email: data.email,
+    password: data.password,
+    password_confirmation: data.confirmPassword,
+    firstname: data.firstname ?? '',
+    lastname: data.lastname ?? '',
+    phone: data.phone ?? '',
+  };
+
+  if (selectedRole === 'company') {
+    payload.rs = data.rs ?? '';
+    payload.sector = data.sector ?? '';
+    payload.country = data.country ?? '';
+    payload.siret = data.siret ?? '';
+    payload.otherCountry = data.otherCountry ?? '';
+    payload.otherSector = data.otherSector ?? '';
+    payload.role_manager = data.role ?? '';
+    payload.otherRole = data.otherRole ?? '';
+  }
+
+  if (selectedRole === 'expert') {
+    payload.sector = data.sector ?? '';
+    payload.experience = data.experience ?? '';
+    payload.dailyRate = data.dailyRate != null && data.dailyRate !== '' ? Number(data.dailyRate) : null;
+    payload.linkedin = data.linkedin || null;
+    if (data.resume && (data.resume[0] instanceof File || data.resume instanceof File)) {
+      payload.resume = data.resume[0] || data.resume;
+    }
+  }
+
+  return payload;
+}
 
 export const useSignupForm = () => {
   const [loading, setLoading] = useState(false);
@@ -28,12 +72,12 @@ export const useSignupForm = () => {
     setFormError('email', { message: '' });
 
     let isValid = false;
-    
+
     if (selectedRole === 'expert') {
       if (currentStep === 1) {
         isValid = await trigger('firstname', 'lastname', 'email', 'phone', 'linkedin');
         if (isValid && data.email) {
-          const emailExists = await signupDB.checkEmailExists(data.email, selectedRole);
+          const emailExists = await checkEmailExists(data.email, selectedRole);
           if (emailExists) {
             setFormError('email', {
               type: 'manual',
@@ -51,7 +95,7 @@ export const useSignupForm = () => {
       } else if (currentStep === 2) {
         isValid = await trigger('firstname', 'lastname', 'email', 'phone', 'role', 'otherRole');
         if (isValid && data.email) {
-          const emailExists = await signupDB.checkEmailExists(data.email, selectedRole);
+          const emailExists = await checkEmailExists(data.email, selectedRole);
           if (emailExists) {
             setFormError('email', {
               type: 'manual',
@@ -82,9 +126,11 @@ export const useSignupForm = () => {
     }
 
     setLoading(true);
+    setFormError('root', { message: '' });
+    setFormError('email', { message: '' });
 
     try {
-      const emailExists = await signupDB.checkEmailExists(data.email, selectedRole);
+      const emailExists = await checkEmailExists(data.email, selectedRole);
       if (emailExists) {
         setFormError('email', {
           type: 'manual',
@@ -94,10 +140,26 @@ export const useSignupForm = () => {
         return;
       }
 
-      const newUser = await signupDB.createUser(selectedRole, data);
-      await db.set('currentUser', newUser);
-      login(selectedRole);
-      router.visit('/');
+      const payload = buildPayload(selectedRole, data);
+
+      router.post('/users/store', payload, {
+        preserveScroll: true,
+        onSuccess: () => {
+          login(selectedRole);
+        },
+        onError: (errors) => {
+          if (errors && typeof errors === 'object') {
+            Object.keys(errors).forEach((field) => {
+              setFormError(field, { type: 'manual', message: Array.isArray(errors[field]) ? errors[field][0] : errors[field] });
+            });
+          } else {
+            setFormError('root', { type: 'manual', message: t(SIGNUP_ERRORS.GENERIC_ERROR) || 'An error occurred. Please try again.' });
+          }
+        },
+        onFinish: () => {
+          setLoading(false);
+        },
+      });
     } catch (err) {
       console.error('Signup error:', err);
       setFormError('root', {
@@ -120,4 +182,3 @@ export const useSignupForm = () => {
     setLoading,
   };
 };
-

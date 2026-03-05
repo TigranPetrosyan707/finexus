@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountPageController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthPageController;
 use App\Http\Controllers\AvailableMissionsPageController;
 use App\Http\Controllers\ChatPageController;
@@ -11,19 +12,25 @@ use App\Http\Controllers\ExpertProfilePageController;
 use App\Http\Controllers\InvoicesPageController;
 use App\Http\Controllers\MissionCalendarPageController;
 use App\Http\Controllers\MissionsPageController;
+use App\Http\Controllers\MissionController;
 use App\Http\Controllers\MyExpertsPageController;
 use App\Http\Controllers\PostMissionPageController;
 use App\Http\Controllers\SearchExpertsPageController;
 use App\Http\Controllers\SubscriptionPageController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-
-    Route::get('/login', [AuthPageController::class, 'login']);
+    Route::get('/login', [AuthPageController::class, 'login'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
     Route::get('/signup', [AuthPageController::class, 'signup']);
     Route::get('/forgot-password', [AuthPageController::class, 'forgotPassword']);
     Route::get('/trial', [AuthPageController::class, 'trial']);
+    Route::post('/users/store', [UserController::class, 'store']);
+    Route::post('/users/check-email', [UserController::class, 'checkEmail']);
 });
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
 
@@ -46,6 +53,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/invoices', [InvoicesPageController::class, 'index']);
     Route::get('/mission-calendar', [MissionCalendarPageController::class, 'index']);
+
+    Route::get('/api/missions', [MissionController::class, 'index']);
+    Route::post('/api/missions', [MissionController::class, 'store']);
+    Route::put('/api/missions/{mission}', [MissionController::class, 'update']);
+    Route::delete('/api/missions/{mission}', [MissionController::class, 'destroy']);
 });
 
 Route::get('/', function () {

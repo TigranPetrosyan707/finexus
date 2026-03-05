@@ -1,20 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { missionsDB } from '../db';
-import { db } from '../../../utils/database';
+import { useAuth } from '../../../context/AuthContext';
 import { createMissionSchema } from '../validation';
 import { POST_MISSION_ERRORS } from '../constants';
 import toast from 'react-hot-toast';
+
+function getCsrfToken() {
+  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
 export const usePostMission = (t) => {
   const [loading, setLoading] = useState(true);
   const [missions, setMissions] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingMission, setEditingMission] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, missionId: null });
   const [isDeleting, setIsDeleting] = useState(false);
+  const { user, userRole } = useAuth();
 
   const {
     register,
@@ -42,42 +46,41 @@ export const usePostMission = (t) => {
     },
   });
 
-  const loadCurrentUser = async () => {
-    try {
-      const user = await db.get('currentUser');
-      setCurrentUser(user);
-    } catch (error) {
-      console.error('Error loading current user:', error);
-    }
-  };
-
   const loadMissions = useCallback(async () => {
     try {
       setLoading(true);
-      const user = await db.get('currentUser');
-      if (user && user.role === 'company') {
-        const companyMissions = await missionsDB.getMissionsByCompanyId(user.id);
-        setMissions(companyMissions);
-      } else {
+      if (!user || userRole !== 'company') {
         setMissions([]);
+        return;
       }
+      const res = await fetch('/api/missions', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error('Failed to load missions');
+      }
+      const data = await res.json();
+      setMissions(data.missions ?? []);
     } catch (error) {
       console.error('Error loading missions:', error);
       toast.error(t(POST_MISSION_ERRORS.LOAD_ERROR) || 'Failed to load missions');
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [t, user, userRole]);
 
   useEffect(() => {
-    loadCurrentUser();
     loadMissions();
   }, [loadMissions]);
 
   const onSubmit = async (formData) => {
     try {
-      const user = await db.get('currentUser');
-      if (!user || user.role !== 'company') {
+      if (!user || userRole !== 'company') {
         toast.error(t(POST_MISSION_ERRORS.CREATE_ERROR) || 'Only companies can post missions');
         return;
       }
@@ -87,25 +90,37 @@ export const usePostMission = (t) => {
         startDate: formData.startDate ? formData.startDate.toISOString().split('T')[0] : '',
       };
 
-      if (editingMission) {
-        const updated = await missionsDB.updateMission(editingMission.id, submitData);
-        if (updated) {
-          toast.success(t('postMission.updateSuccess') || 'Mission updated successfully');
-          await loadMissions();
-          resetForm();
-        } else {
-          toast.error(t(POST_MISSION_ERRORS.UPDATE_ERROR) || 'Failed to update mission');
-        }
-      } else {
-        const newMission = await missionsDB.createMission(submitData, user.id);
-        if (newMission) {
-          toast.success(t('postMission.createSuccess') || 'Mission created successfully');
-          await loadMissions();
-          resetForm();
-        } else {
-          toast.error(t(POST_MISSION_ERRORS.CREATE_ERROR) || 'Failed to create mission');
-        }
+      const method = editingMission ? 'PUT' : 'POST';
+      const url = editingMission ? `/api/missions/${editingMission.id}` : '/api/missions';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-XSRF-TOKEN': getCsrfToken() || '',
+        },
+        body: JSON.stringify(submitData),
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        toast.error(
+          editingMission
+            ? t(POST_MISSION_ERRORS.UPDATE_ERROR) || 'Failed to update mission'
+            : t(POST_MISSION_ERRORS.CREATE_ERROR) || 'Failed to create mission'
+        );
+        return;
       }
+
+      if (editingMission) {
+        toast.success(t('postMission.updateSuccess') || 'Mission updated successfully');
+      } else {
+        toast.success(t('postMission.createSuccess') || 'Mission created successfully');
+      }
+      await loadMissions();
+      resetForm();
     } catch (error) {
       console.error('Error submitting mission:', error);
       toast.error(
@@ -167,7 +182,18 @@ export const usePostMission = (t) => {
 
     setIsDeleting(true);
     try {
-      await missionsDB.deleteMission(deleteModal.missionId);
+      const res = await fetch(`/api/missions/${deleteModal.missionId}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-XSRF-TOKEN': getCsrfToken() || '',
+        },
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error('Failed to delete mission');
+      }
       toast.success(t('postMission.deleteSuccess') || 'Mission deleted successfully');
       await loadMissions();
       setDeleteModal({ isOpen: false, missionId: null });
@@ -189,7 +215,6 @@ export const usePostMission = (t) => {
     missions,
     showForm,
     editingMission,
-    currentUser,
     register,
     control,
     handleSubmit,

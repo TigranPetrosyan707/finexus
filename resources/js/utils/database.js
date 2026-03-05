@@ -1,4 +1,5 @@
 import localforage from 'localforage';
+import {router} from "@inertiajs/react";
 
 localforage.config({
   name: 'FinanceManagement',
@@ -59,7 +60,7 @@ export const db = {
 export const userDB = {
   async createUser(userData) {
     const users = await db.get('users') || [];
-    
+
     if (!userData.role) {
       throw new Error('Role is required when creating a user');
     }
@@ -77,9 +78,12 @@ export const userDB = {
       ...userData,
       createdAt: new Date().toISOString(),
     };
-    
+
     users.push(newUser);
-    await db.set('users', users);
+
+    router.post('/users/store', {
+      users: users
+    });
     return newUser;
   },
 

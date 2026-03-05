@@ -27,7 +27,7 @@ const SIGNUP_STORAGE_KEY = 'signup_form_data';
 
 const Signup = () => {
   const { t, i18n } = useTranslation();
-  const { url } = usePage();
+  const { url, props } = usePage();
   const {
     loading,
     selectedRole,
@@ -103,6 +103,17 @@ const Signup = () => {
       setIsInitialLoad(false);
     }
   }, [setSelectedRole, setCurrentStep, setValue]);
+
+  useEffect(() => {
+    const serverErrors = props.errors;
+    if (serverErrors && typeof serverErrors === 'object' && Object.keys(serverErrors).length > 0) {
+      Object.keys(serverErrors).forEach((field) => {
+        const msg = Array.isArray(serverErrors[field]) ? serverErrors[field][0] : serverErrors[field];
+        const formField = field === 'password_confirmation' ? 'confirmPassword' : field;
+        setFormError(formField, { type: 'server', message: msg });
+      });
+    }
+  }, [props.errors, setFormError]);
 
   useEffect(() => {
     if (selectedRole && !isInitialLoad) {

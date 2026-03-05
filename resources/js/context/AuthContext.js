@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 
 const AuthContext = createContext();
 
@@ -11,29 +11,44 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
-  });
-  const [userRole, setUserRole] = useState(() => {
-    return localStorage.getItem('userRole') || 'company';
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState('company');
+  const [user, setUser] = useState(null);
 
-  const login = (role = 'company') => {
+  const login = useCallback((role = 'company', userData = null) => {
     setIsAuthenticated(true);
     setUserRole(role);
+    setUser(userData || null);
     localStorage.setItem('isAuthenticated', 'true');
     localStorage.setItem('userRole', role);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setIsAuthenticated(false);
     setUserRole('company');
+    setUser(null);
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
-  };
+  }, []);
+
+  const setAuthFromServer = useCallback((authPayload) => {
+    if (authPayload?.user) {
+      setIsAuthenticated(true);
+      setUserRole(authPayload.user.role || 'company');
+      setUser(authPayload.user);
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userRole', authPayload.user.role || 'company');
+    } else {
+      setIsAuthenticated(false);
+      setUserRole('company');
+      setUser(null);
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('userRole');
+    }
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userRole, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userRole, user, login, logout, setAuthFromServer }}>
       {children}
     </AuthContext.Provider>
   );

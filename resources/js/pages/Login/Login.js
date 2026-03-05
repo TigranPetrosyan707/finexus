@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from '@inertiajs/react';
+import React, { useEffect } from 'react';
+import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,6 +13,7 @@ import Input from '../../components/UI/Input/Input';
 
 const Login = () => {
   const { t } = useTranslation();
+  const { props } = usePage();
   const {
     languages,
     currentLanguage,
@@ -35,6 +36,16 @@ const Login = () => {
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
   });
+
+  useEffect(() => {
+    const serverErrors = props.errors;
+    if (serverErrors && typeof serverErrors === 'object' && Object.keys(serverErrors).length > 0) {
+      Object.keys(serverErrors).forEach((field) => {
+        const msg = Array.isArray(serverErrors[field]) ? serverErrors[field][0] : serverErrors[field];
+        setFormError(field, { type: 'server', message: msg });
+      });
+    }
+  }, [props.errors, setFormError]);
 
   const onSubmit = async (data) => {
     await handleLogin(data, setFormError, t);
