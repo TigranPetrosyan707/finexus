@@ -1,9 +1,15 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaUser, FaEdit } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
 import Button from '../../../components/UI/Button/Button';
+import { getRoleDisplayLabel } from '../../Signup/utils';
 
 const UserInfo = ({ userInfo, userRole, onEdit, t }) => {
+  const { i18n } = useTranslation();
+  const isOtherRole = userInfo.role === 'Autre' || userInfo.role === 'Other';
+  const displayRole = isOtherRole ? (userInfo.otherRole || userInfo.role) : getRoleDisplayLabel(userInfo.role, t, i18n) || userInfo.role;
+
   return (
     <div className="bg-white rounded-xl p-6 lg:p-8 shadow-lg border border-gray-200 mb-8">
       <div className="flex items-center justify-between mb-6">
@@ -46,10 +52,10 @@ const UserInfo = ({ userInfo, userRole, onEdit, t }) => {
             <span className="text-base text-gray-900">{userInfo.phone}</span>
           </div>
         )}
-        {userInfo.role && (
+        {(displayRole || userInfo.role) && (
           <div className="p-4 rounded-lg bg-gray-50">
             <strong className="text-sm font-semibold text-gray-700 block mb-1">{t('account.role')}:</strong>
-            <span className="text-base text-gray-900">{userInfo.role}</span>
+            <span className="text-base text-gray-900">{displayRole || userInfo.role}</span>
           </div>
         )}
       </div>

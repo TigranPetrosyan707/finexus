@@ -41,10 +41,14 @@ const CompanyInfo = ({ companyInfo, onEdit, t }) => {
             <span className="text-base text-gray-900">{companyInfo.siret}</span>
           </div>
         )}
-        {companyInfo.country && (
+        {(companyInfo.displayCountry || companyInfo.country) && (
           <div className="p-4 rounded-lg bg-gray-50">
             <strong className="text-sm font-semibold text-gray-700 block mb-1">{t('account.country')}:</strong>
-            <span className="text-base text-gray-900">{getCountryName(companyInfo.country, i18n.language)}</span>
+            <span className="text-base text-gray-900">
+              {companyInfo.country === 'OTHER' || companyInfo.country === 'Autre' || companyInfo.country === 'Other'
+                ? (companyInfo.displayCountry || companyInfo.otherCountry || '')
+                : getCountryName(companyInfo.country, i18n.language)}
+            </span>
           </div>
         )}
         {companyInfo.address && (
@@ -53,10 +57,10 @@ const CompanyInfo = ({ companyInfo, onEdit, t }) => {
             <span className="text-base text-gray-900">{companyInfo.address}</span>
           </div>
         )}
-        {companyInfo.sector && (
+        {(companyInfo.displaySector || companyInfo.sector) && (
           <div className="p-4 rounded-lg bg-gray-50">
             <strong className="text-sm font-semibold text-gray-700 block mb-1">{t('account.sector')}:</strong>
-            <span className="text-base text-gray-900">{companyInfo.sector}</span>
+            <span className="text-base text-gray-900">{companyInfo.displaySector ?? companyInfo.sector}</span>
           </div>
         )}
       </div>

@@ -26,12 +26,20 @@ export const formatCompanyInfo = (user) => {
     };
   }
 
+  const sector = user.companyInfo.sector || '';
+  const country = user.companyInfo.country || '';
+  const isOtherSector = sector === 'Autre' || sector === 'Other';
+  const isOtherCountry = country === 'OTHER' || country === 'Autre' || country === 'Other';
   return {
     name: user.companyInfo.name || '',
     siret: user.companyInfo.registrationNumber || '',
-    country: user.companyInfo.country || '',
+    country,
     address: user.companyInfo.address || '',
-    sector: user.companyInfo.sector || '',
+    sector,
+    otherSector: user.companyInfo.otherSector || '',
+    otherCountry: user.companyInfo.otherCountry || '',
+    displaySector: isOtherSector ? (user.companyInfo.otherSector || sector) : sector,
+    displayCountry: isOtherCountry ? (user.companyInfo.otherCountry || country) : country,
     fiscalId: user.companyInfo.fiscalId || '',
   };
 };
@@ -54,6 +62,7 @@ export const formatUserInfo = (user) => {
       email: user.managerInfo.email || user.email || '',
       phone: user.managerInfo.phone || '',
       role: user.managerInfo.role || '',
+      otherRole: user.managerInfo.otherRole || '',
     };
   }
 

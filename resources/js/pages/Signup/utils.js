@@ -15,19 +15,28 @@ export const getTranslatedOptions = (options, i18n) => {
   });
 };
 
+const getRoleTranslationMap = (t, i18n) => ({
+  'Dirigeant': t('signup.roles.manager'),
+  'DAF': t('signup.roles.daf'),
+  'Comptable': t('signup.roles.accountant'),
+  'Contrôleur de gestion': t('signup.roles.controller'),
+  'Autre': i18n.language === 'en' ? 'Other' : 'Autre',
+});
+
 export const getTranslatedRoleOptions = (t, i18n) => {
-  const roleTranslations = {
-    'Dirigeant': t('signup.roles.manager'),
-    'DAF': t('signup.roles.daf'),
-    'Comptable': t('signup.roles.accountant'),
-    'Contrôleur de gestion': t('signup.roles.controller'),
-    'Autre': i18n.language === 'en' ? 'Other' : 'Autre',
-  };
-  
+  const roleTranslations = getRoleTranslationMap(t, i18n);
   return roleOptions.map(option => ({
     value: option,
     label: roleTranslations[option] || option
   }));
+};
+
+/** Returns the display label for a role value (e.g. 'Dirigeant' -> 'Manager'). Use otherRole when value is Autre/Other. */
+export const getRoleDisplayLabel = (roleValue, t, i18n) => {
+  if (!roleValue) return '';
+  if (roleValue === 'Autre' || roleValue === 'Other') return ''; // caller should use otherRole instead
+  const map = getRoleTranslationMap(t, i18n);
+  return map[roleValue] || roleValue;
 };
 
 export const getAllCountries = (i18n) => {
