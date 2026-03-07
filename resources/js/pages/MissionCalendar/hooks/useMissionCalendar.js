@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { assignedMissionsDB } from '../../Missions/db';
-import { db } from '../../../utils/database';
+import { api } from '../../../utils/api';
 
 export const useMissionCalendar = () => {
   const [loading, setLoading] = useState(true);
@@ -11,21 +10,12 @@ export const useMissionCalendar = () => {
     const loadMissions = async () => {
       try {
         setLoading(true);
-        const currentUser = await db.get('currentUser');
-        
-        if (!currentUser || currentUser.role !== 'expert') {
-          setMissions([]);
-          return;
-        }
-
-        const enrichedMissions = await assignedMissionsDB.getEnrichedMissionsForExpert(currentUser.id);
-        
-        const activeMissions = enrichedMissions.filter(m => 
+        const { data } = await api.get('/api/assigned-missions');
+        const list = data || [];
+        const activeMissions = list.filter(m =>
           m.status === 'active' || m.status === 'pending'
         );
-
         setMissions(activeMissions);
-        
         if (activeMissions.length > 0) {
           setSelectedMission(prev => prev || activeMissions[0]);
         }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { myExpertsDB } from '../db';
-import { db } from '../../../utils/database';
+import { api } from '../../../utils/api';
+import { formatExpertData } from '../../SearchExperts/utils';
 
 export const useMyExperts = () => {
   const [loading, setLoading] = useState(true);
@@ -10,15 +10,9 @@ export const useMyExperts = () => {
   const loadExperts = useCallback(async () => {
     try {
       setLoading(true);
-      const currentUser = await db.get('currentUser');
-      
-      if (!currentUser || currentUser.role !== 'company') {
-        setExperts([]);
-        return;
-      }
-
-      const expertsData = await myExpertsDB.getExpertsForCompany(currentUser.id);
-      setExperts(expertsData);
+      const { data } = await api.get('/api/experts/my-experts');
+      const formatted = (data || []).map(formatExpertData);
+      setExperts(formatted);
     } catch (error) {
       console.error('Error loading experts:', error);
       setExperts([]);

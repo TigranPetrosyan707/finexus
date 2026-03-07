@@ -6,8 +6,7 @@ import Button from '../../../components/UI/Button/Button';
 import RejectModal from './RejectModal';
 import RejectionReasonModal from './RejectionReasonModal';
 import ApplicationRejectModal from './ApplicationRejectModal';
-import { hireRequestsDB } from '../../HireRequests/db';
-import { db } from '../../../utils/database';
+import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
 const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => {
@@ -45,32 +44,34 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
     }
   };
 
+  const handleAcceptHire = async () => {
+    if (!assignedMission.hireRequest?.id) return;
+    try {
+      setIsRejecting(true);
+      await api.post(`/api/hire-requests/${assignedMission.hireRequest.id}/accept`);
+      toast.success(t('missions.acceptSuccess') || 'Request accepted successfully');
+      if (onStatusChange) onStatusChange();
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      toast.error(t('missions.rejectError') || 'Failed to accept request');
+    } finally {
+      setIsRejecting(false);
+    }
+  };
+
   const handleReject = async (rejectionReason) => {
     if (!assignedMission.hireRequest?.id) {
       toast.error(t('missions.rejectError') || 'Unable to reject request');
       return;
     }
-
     try {
       setIsRejecting(true);
-      const currentUser = await db.get('currentUser');
-      if (!currentUser) {
-        toast.error(t('missions.rejectError') || 'User not found');
-        return;
-      }
-
-      await hireRequestsDB.rejectHireRequest(
-        assignedMission.hireRequest.id,
-        currentUser.id,
-        rejectionReason || null
-      );
-
+      await api.post(`/api/hire-requests/${assignedMission.hireRequest.id}/reject`, {
+        rejectionReason: rejectionReason || null,
+      });
       toast.success(t('missions.rejectSuccess') || 'Request rejected successfully');
       setShowRejectModal(false);
-      
-      if (onStatusChange) {
-        onStatusChange();
-      }
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('Error rejecting request:', error);
       toast.error(t('missions.rejectError') || 'Failed to reject request');
@@ -84,25 +85,11 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
       toast.error(t('missions.acceptApplicationError') || 'Unable to accept application');
       return;
     }
-
     try {
       setIsRejecting(true);
-      const currentUser = await db.get('currentUser');
-      if (!currentUser) {
-        toast.error(t('missions.acceptApplicationError') || 'User not found');
-        return;
-      }
-
-      await hireRequestsDB.acceptApplicationRequest(
-        assignedMission.applicationRequest.id,
-        currentUser.id
-      );
-
+      await api.post(`/api/hire-requests/${assignedMission.applicationRequest.id}/accept`);
       toast.success(t('missions.acceptApplicationSuccess') || 'Application accepted successfully');
-      
-      if (onStatusChange) {
-        onStatusChange();
-      }
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('Error accepting application:', error);
       toast.error(t('missions.acceptApplicationError') || 'Failed to accept application');
@@ -116,27 +103,14 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
       toast.error(t('missions.rejectApplicationError') || 'Unable to reject application');
       return;
     }
-
     try {
       setIsRejecting(true);
-      const currentUser = await db.get('currentUser');
-      if (!currentUser) {
-        toast.error(t('missions.rejectApplicationError') || 'User not found');
-        return;
-      }
-
-      await hireRequestsDB.rejectApplicationRequest(
-        assignedMission.applicationRequest.id,
-        currentUser.id,
-        rejectionReason || null
-      );
-
+      await api.post(`/api/hire-requests/${assignedMission.applicationRequest.id}/reject`, {
+        rejectionReason: rejectionReason || null,
+      });
       toast.success(t('missions.rejectApplicationSuccess') || 'Application rejected successfully');
       setShowApplicationRejectModal(false);
-      
-      if (onStatusChange) {
-        onStatusChange();
-      }
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('Error rejecting application:', error);
       toast.error(t('missions.rejectApplicationError') || 'Failed to reject application');
@@ -210,7 +184,8 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
                   <>
                     <Button
                       style={{ backgroundColor: '#10b981', color: '#fff' }}
-                      onClick={() => {}}
+                      onClick={handleAcceptHire}
+                      disabled={isRejecting}
                     >
                       {t('missions.accept')}
                     </Button>

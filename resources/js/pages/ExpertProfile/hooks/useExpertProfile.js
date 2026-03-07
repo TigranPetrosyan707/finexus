@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { expertProfileDB } from '../db';
+import { api } from '../../../utils/api';
 import { formatExpertProfile } from '../db/schema';
 import { createExpertProfileSchema } from '../validation';
 import toast from 'react-hot-toast';
@@ -26,17 +26,13 @@ export const useExpertProfile = (t) => {
     const loadProfile = async () => {
       try {
         setLoading(true);
-        const expert = await expertProfileDB.getCurrentExpert();
-        
+        const { expert, stats } = await api.get('/api/expert-profile');
         if (!expert) {
           toast.error(t('expertProfile.loadError') || 'Failed to load profile');
           return;
         }
-
-        const stats = await expertProfileDB.getExpertStats(expert.id);
-        const formattedProfile = formatExpertProfile(expert, stats);
+        const formattedProfile = formatExpertProfile(expert, stats || {});
         setProfile(formattedProfile);
-        
         reset({
           firstname: formattedProfile.firstname,
           lastname: formattedProfile.lastname,
@@ -63,24 +59,23 @@ export const useExpertProfile = (t) => {
   const onSubmit = async (formData) => {
     try {
       setIsUpdating(true);
-      const expert = await expertProfileDB.getCurrentExpert();
-      
-      if (!expert) {
-        toast.error(t('expertProfile.updateError') || 'Failed to update profile');
-        return;
-      }
-
-      const updated = await expertProfileDB.updateExpertProfile(expert.id, formData);
-      
-      if (updated) {
-        const stats = await expertProfileDB.getExpertStats(updated.id);
-        const formattedProfile = formatExpertProfile(updated, stats);
-        setProfile(formattedProfile);
-        setIsEditing(false);
-        toast.success(t('expertProfile.updateSuccess') || 'Profile updated successfully');
-      } else {
-        toast.error(t('expertProfile.updateError') || 'Failed to update profile');
-      }
+      const payload = {
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        email: formData.email,
+        phone: formData.phone,
+        linkedin: formData.linkedin,
+        profession: formData.profession,
+        experience: formData.experience,
+        dailyRate: formData.dailyRate,
+        description: formData.description,
+        specialties: formData.specialties || [],
+      };
+      const { expert, stats } = await api.put('/api/expert-profile', payload);
+      const formattedProfile = formatExpertProfile(expert, stats || {});
+      setProfile(formattedProfile);
+      setIsEditing(false);
+      toast.success(t('expertProfile.updateSuccess') || 'Profile updated successfully');
     } catch (error) {
       console.error('Error updating expert profile:', error);
       toast.error(t('expertProfile.updateError') || 'Failed to update profile');

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { accountDB } from '../db';
+import { api } from '../../../utils/api';
 import { formatCompanyInfo, formatUserInfo } from '../db/schema';
 import { createPasswordChangeSchema, createCompanyInfoSchema, createUserInfoSchema } from '../validation';
 import { ACCOUNT_ERRORS } from '../constants';
@@ -45,15 +45,14 @@ export const useAccount = (t, userRole) => {
   const loadAccountData = useCallback(async () => {
     try {
       setLoading(true);
-      const user = await accountDB.getCurrentUser();
-      
+      const { user } = await api.get('/api/user');
       if (user) {
         setCurrentUser(user);
         const formattedCompanyInfo = formatCompanyInfo(user);
         const formattedUserInfo = formatUserInfo(user);
         setCompanyInfo(formattedCompanyInfo);
         setUserInfo(formattedUserInfo);
-        
+
         if (formattedCompanyInfo && formattedCompanyInfo.name) {
           let countryCode = formattedCompanyInfo.country;
           if (countryCode === 'France') countryCode = 'FR';
@@ -62,7 +61,7 @@ export const useAccount = (t, userRole) => {
           else if (countryCode === 'Luxembourg') countryCode = 'LU';
           else if (countryCode === 'Canada') countryCode = 'CA';
           else if (countryCode === 'Autre') countryCode = 'OTHER';
-          
+
           companyForm.reset({
             name: formattedCompanyInfo.name,
             sector: formattedCompanyInfo.sector || '',
@@ -72,7 +71,7 @@ export const useAccount = (t, userRole) => {
             siret: formattedCompanyInfo.siret || '',
           });
         }
-        
+
         if (formattedUserInfo) {
           userForm.reset({
             firstname: formattedUserInfo.firstname,
@@ -106,12 +105,11 @@ export const useAccount = (t, userRole) => {
 
     setIsUpdatingPassword(true);
     try {
-      await accountDB.updatePassword(
-        currentUser.id,
-        formData.oldPassword,
-        formData.newPassword
-      );
-      
+      await api.put('/api/account/password', {
+        currentPassword: formData.oldPassword,
+        newPassword: formData.newPassword,
+        newPassword_confirmation: formData.confirmPassword,
+      });
       toast.success(t('changePassword.success') || 'Password updated successfully');
       passwordForm.reset({
         oldPassword: '',
@@ -122,7 +120,8 @@ export const useAccount = (t, userRole) => {
       await loadAccountData();
     } catch (error) {
       console.error('Error updating password:', error);
-      if (error.message === 'Current password is incorrect') {
+      const msg = error.data?.message || error.message;
+      if (msg.includes('incorrect') || msg.includes('Current password')) {
         passwordForm.setError('oldPassword', {
           type: 'manual',
           message: t(ACCOUNT_ERRORS.PASSWORD_INCORRECT) || 'Current password is incorrect',
@@ -149,7 +148,15 @@ export const useAccount = (t, userRole) => {
 
     setIsUpdatingCompany(true);
     try {
-      await accountDB.updateCompanyInfo(currentUser.id, formData);
+      await api.put('/api/account/company-info', {
+        name: formData.name,
+        siret: formData.siret,
+        country: formData.country,
+        address: formData.address,
+        sector: formData.sector,
+        otherSector: formData.otherSector,
+        otherCountry: formData.otherCountry,
+      });
       toast.success(t('account.companyUpdateSuccess') || 'Company information updated successfully');
       setShowCompanyForm(false);
       await loadAccountData();
@@ -175,7 +182,13 @@ export const useAccount = (t, userRole) => {
 
     setIsUpdatingUser(true);
     try {
-      await accountDB.updateUserInfo(currentUser.id, formData, userRole);
+      await api.put('/api/account/user-info', {
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        email: formData.email,
+        phone: formData.phone,
+        role: formData.role,
+      });
       toast.success(t('account.userUpdateSuccess') || 'User information updated successfully');
       setShowUserForm(false);
       await loadAccountData();

@@ -5,7 +5,7 @@ import { FaEuroSign, FaClock, FaMapMarkerAlt, FaCalendarAlt, FaArrowLeft, FaBrie
 import { colors } from '../../../constants/colors';
 import Button from '../../../components/UI/Button/Button';
 import { formatMissionDate, getSectorOptions } from '../../PostMission/utils';
-import { availableMissionsDB } from '../../AvailableMissions/db';
+import { api } from '../../../utils/api';
 
 const MissionViewFromRequest = ({ id }) => {
   const { t, i18n } = useTranslation();
@@ -14,11 +14,14 @@ const MissionViewFromRequest = ({ id }) => {
 
   useEffect(() => {
     const loadMission = async () => {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
       try {
         setLoading(true);
-        const allMissions = await availableMissionsDB.getAllAvailableMissions();
-        const foundMission = allMissions.find(m => m.id === id);
-        setMission(foundMission || null);
+        const { data } = await api.get(`/api/available-missions/${id}`);
+        setMission(data || null);
       } catch (error) {
         console.error('Error loading mission:', error);
         setMission(null);
@@ -27,9 +30,7 @@ const MissionViewFromRequest = ({ id }) => {
       }
     };
 
-    if (id) {
-      loadMission();
-    }
+    loadMission();
   }, [id]);
 
   if (loading) {
@@ -71,7 +72,7 @@ const MissionViewFromRequest = ({ id }) => {
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         <Button
-          onClick={() => navigate('/missions')}
+          onClick={() => router.visit('/missions')}
           variant="secondary"
           className="mb-6 flex items-center space-x-2"
         >

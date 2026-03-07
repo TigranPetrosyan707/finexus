@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { expertsDB } from '../../SearchExperts/db';
+import { api } from '../../../utils/api';
 import { formatExpertProfile } from '../../ExpertProfile/db/schema';
-import { assignedMissionsDB } from '../../Missions/db';
 import toast from 'react-hot-toast';
 
 export const useExpertDetails = (expertId, t) => {
@@ -10,22 +9,16 @@ export const useExpertDetails = (expertId, t) => {
 
   useEffect(() => {
     const loadExpert = async () => {
+      if (!expertId) return;
       try {
         setLoading(true);
-        const expert = await expertsDB.getExpertById(expertId);
-        
-        if (!expert || expert.role !== 'expert') {
+        const { expert, assignedMissions } = await api.get(`/api/experts/${expertId}`);
+        if (!expert) {
           setProfile(null);
           return;
         }
-
-        const assignedMissions = await assignedMissionsDB.getAssignedMissionsByExpertId(expertId);
-        const completedMissions = assignedMissions.filter(m => m.status === 'completed').length;
-        
-        const stats = {
-          completedMissions,
-        };
-
+        const completed = (assignedMissions || []).filter(m => m.status === 'completed').length;
+        const stats = { completedMissions: completed };
         const formattedProfile = formatExpertProfile(expert, stats);
         setProfile(formattedProfile);
       } catch (error) {
@@ -37,9 +30,7 @@ export const useExpertDetails = (expertId, t) => {
       }
     };
 
-    if (expertId) {
-      loadExpert();
-    }
+    loadExpert();
   }, [expertId, t]);
 
   return { profile, loading };

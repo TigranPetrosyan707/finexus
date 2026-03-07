@@ -1,82 +1,56 @@
 import { useState, useEffect, useCallback } from 'react';
-import { hireRequestsDB } from '../db';
-import { availableMissionsDB } from '../../AvailableMissions/db';
-import { db } from '../../../utils/database';
+import { useAuth } from '../../../context/AuthContext';
+import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
 export const useApplicationRequest = (missionId) => {
+  const { user: currentUser } = useAuth();
   const [applicationRequest, setApplicationRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
 
   const loadData = useCallback(async () => {
+    if (!currentUser || currentUser.role !== 'expert' || !missionId) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      const user = await db.get('currentUser');
-      setCurrentUser(user);
-
-      if (user && user.role === 'expert' && missionId) {
-        const request = await hireRequestsDB.getApplicationRequestByExpertAndMission(
-          user.id,
-          missionId
-        );
-        setApplicationRequest(request);
-      }
+      const { data: list } = await api.get('/api/hire-requests?type=application');
+      const request = (list || []).find(r => r.missionId === Number(missionId)) || null;
+      setApplicationRequest(request);
     } catch (error) {
       console.error('Error loading application request:', error);
     } finally {
       setLoading(false);
     }
-  }, [missionId]);
+  }, [missionId, currentUser]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const sendApplicationRequest = async (missionId) => {
+  const sendApplicationRequest = async (mid) => {
     if (!currentUser || currentUser.role !== 'expert') {
       toast.error('Only experts can send application requests');
       return false;
     }
-
-    if (!missionId) {
+    if (!mid) {
       toast.error('Mission ID is required');
       return false;
     }
-
-    const existingRequest = await hireRequestsDB.getApplicationRequestByExpertAndMission(
-      currentUser.id,
-      missionId
-    );
-
-    if (existingRequest) {
-      if (existingRequest.status === 'pending') {
-        toast.error('Application already pending for this mission');
-        return false;
-      }
-      if (existingRequest.status === 'accepted') {
-        toast.error('Application already accepted for this mission');
-        return false;
-      }
+    if (applicationRequest?.status === 'pending') {
+      toast.error('Application already pending for this mission');
+      return false;
     }
-
+    if (applicationRequest?.status === 'accepted') {
+      toast.error('Application already accepted for this mission');
+      return false;
+    }
     try {
-      const mission = await availableMissionsDB.getMissionById(missionId);
-      if (!mission) {
-        toast.error('Mission not found');
-        return false;
-      }
-
       setIsSending(true);
-      await hireRequestsDB.createApplicationRequest(
-        currentUser.id,
-        mission.companyId,
-        missionId
-      );
-      
+      await api.post('/api/hire-requests', { type: 'application', missionId: Number(mid) });
       await loadData();
-      
       toast.success('Application sent successfully');
       return true;
     } catch (error) {
@@ -94,9 +68,9 @@ export const useApplicationRequest = (missionId) => {
     isSending,
     currentUser,
     sendApplicationRequest,
-    hasPendingApplication: applicationRequest && applicationRequest.status === 'pending',
-    hasAcceptedApplication: applicationRequest && applicationRequest.status === 'accepted',
-    hasRejectedApplication: applicationRequest && applicationRequest.status === 'rejected',
+    hasPendingApplication: applicationRequest?.status === 'pending',
+    hasAcceptedApplication: applicationRequest?.status === 'accepted',
+    hasRejectedApplication: applicationRequest?.status === 'rejected',
     hasApplication: !!applicationRequest,
     reloadData: loadData,
   };

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { expertsDB } from '../db';
+import { api } from '../../../utils/api';
 import { filterExperts, formatExpertData } from '../utils';
 import useDebounce from '../../../hooks/useDebounce';
 
@@ -25,8 +25,8 @@ export const useSearchExperts = () => {
     const loadExperts = async () => {
       try {
         setLoading(true);
-        const expertsData = await expertsDB.getAllExperts();
-        const formattedExperts = expertsData.map(formatExpertData);
+        const { data: expertsData } = await api.get('/api/experts');
+        const formattedExperts = (expertsData || []).map(formatExpertData);
         setExperts(formattedExperts);
       } catch (error) {
         console.error('Error loading experts:', error);

@@ -1,6 +1,14 @@
 <?php
 
 use App\Http\Controllers\AccountPageController;
+use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\AssignedMissionController;
+use App\Http\Controllers\Api\AvailableMissionController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ExpertController;
+use App\Http\Controllers\Api\ExpertProfileController;
+use App\Http\Controllers\Api\HireRequestController;
+use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthPageController;
 use App\Http\Controllers\AvailableMissionsPageController;
@@ -58,6 +66,40 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/missions', [MissionController::class, 'store']);
     Route::put('/api/missions/{mission}', [MissionController::class, 'update']);
     Route::delete('/api/missions/{mission}', [MissionController::class, 'destroy']);
+
+    Route::get('/api/user', [AccountController::class, 'show']);
+    Route::put('/api/account/password', [AccountController::class, 'updatePassword']);
+    Route::put('/api/account/company-info', [AccountController::class, 'updateCompanyInfo']);
+    Route::put('/api/account/user-info', [AccountController::class, 'updateUserInfo']);
+
+    Route::get('/api/invoices', [InvoiceController::class, 'index']);
+    Route::post('/api/invoices', [InvoiceController::class, 'store']);
+    Route::post('/api/invoices/import', [InvoiceController::class, 'import']);
+    Route::get('/api/invoices/{invoice}', [InvoiceController::class, 'show']);
+    Route::put('/api/invoices/{invoice}', [InvoiceController::class, 'update']);
+    Route::delete('/api/invoices/{invoice}', [InvoiceController::class, 'destroy']);
+
+    Route::get('/api/dashboard/company-financial', [DashboardController::class, 'companyFinancial']);
+    Route::put('/api/dashboard/company-financial', [DashboardController::class, 'updateCompanyFinancial']);
+    Route::get('/api/dashboard/expert-stats', [DashboardController::class, 'expertStats']);
+    Route::put('/api/dashboard/expert-stats', [DashboardController::class, 'updateExpertStats']);
+
+    Route::get('/api/expert-profile', [ExpertProfileController::class, 'show']);
+    Route::put('/api/expert-profile', [ExpertProfileController::class, 'update']);
+
+    Route::get('/api/experts', [ExpertController::class, 'index']);
+    Route::get('/api/experts/my-experts', [ExpertController::class, 'myExperts']);
+    Route::get('/api/experts/{id}', [ExpertController::class, 'show']);
+
+    Route::get('/api/assigned-missions', [AssignedMissionController::class, 'index']);
+
+    Route::get('/api/hire-requests', [HireRequestController::class, 'index']);
+    Route::post('/api/hire-requests', [HireRequestController::class, 'store']);
+    Route::post('/api/hire-requests/{id}/accept', [HireRequestController::class, 'accept']);
+    Route::post('/api/hire-requests/{id}/reject', [HireRequestController::class, 'reject']);
+
+    Route::get('/api/available-missions', [AvailableMissionController::class, 'index']);
+    Route::get('/api/available-missions/{id}', [AvailableMissionController::class, 'show']);
 });
 
 Route::get('/', function () {

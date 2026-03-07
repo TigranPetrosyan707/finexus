@@ -5,7 +5,7 @@ import { FaEuroSign, FaClock, FaMapMarkerAlt, FaCalendarAlt, FaArrowLeft, FaBrie
 import { colors } from '../../constants/colors';
 import Button from '../../components/UI/Button/Button';
 import { formatMissionDate, getSectorOptions } from '../PostMission/utils';
-import { availableMissionsDB } from './db';
+import { api } from '../../utils/api';
 
 const MissionDetails = ({ id }) => {
   const { t, i18n } = useTranslation();
@@ -14,15 +14,17 @@ const MissionDetails = ({ id }) => {
 
   useEffect(() => {
     const loadMission = async () => {
+      if (!id) return;
       try {
-        const allMissions = await availableMissionsDB.getAllAvailableMissions();
-        const foundMission = allMissions.find(m => m.id === id);
-        
+        const [{ data: single }, { data: list }] = await Promise.all([
+          api.get(`/api/available-missions/${id}`),
+          api.get('/api/available-missions'),
+        ]);
+        const foundMission = single || (list || []).find(m => m.id === Number(id));
         if (foundMission) {
           setMission(foundMission);
-          
-          const otherMissions = allMissions.filter(
-            m => m.id !== id && m.companyId === foundMission.companyId
+          const otherMissions = (list || []).filter(
+            m => m.id !== foundMission.id && m.companyId === foundMission.companyId
           );
           setCompanyMissions(otherMissions);
         } else {
@@ -34,9 +36,7 @@ const MissionDetails = ({ id }) => {
       }
     };
 
-    if (id) {
-      loadMission();
-    }
+    loadMission();
   }, [id]);
 
 
@@ -68,7 +68,7 @@ const MissionDetails = ({ id }) => {
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         <Button
-          onClick={() => navigate('/available-missions')}
+          onClick={() => router.visit('/available-missions')}
           variant="secondary"
           className="mb-6 flex items-center space-x-2"
         >

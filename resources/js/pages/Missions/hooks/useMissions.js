@@ -1,8 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
-import { assignedMissionsDB } from '../db';
-import { hireRequestsDB } from '../../HireRequests/db';
-import { enrichHireRequest, convertHireRequestToMissionFormat, convertApplicationRequestToMissionFormat } from '../../HireRequests/utils';
-import { db } from '../../../utils/database';
+import { api } from '../../../utils/api';
+import { convertHireRequestToMissionFormat, convertApplicationRequestToMissionFormat } from '../../HireRequests/utils';
+
+function assignedToCard(a) {
+  return {
+    id: a.id,
+    missionId: a.missionId,
+    companyId: a.companyId ?? a.mission?.companyId ?? null,
+    expertId: a.expertId ?? a.expert?.id ?? null,
+    status: a.status,
+    startDate: a.startDate || '',
+    endDate: a.endDate || null,
+    createdAt: a.createdAt,
+    updatedAt: a.updatedAt,
+    isHireRequest: false,
+    isApplicationRequest: false,
+    mission: a.mission || null,
+    company: a.company || null,
+    expert: a.expert || null,
+  };
+}
 
 export const useMissions = (userRole) => {
   const [loading, setLoading] = useState(true);
@@ -12,58 +29,19 @@ export const useMissions = (userRole) => {
   const loadMissions = useCallback(async () => {
     try {
       setLoading(true);
-      const currentUser = await db.get('currentUser');
-      
-      if (!currentUser) {
-        setMissions([]);
-        return;
-      }
-
-      let enrichedMissions = [];
-      
-      if (userRole === 'company') {
-        enrichedMissions = await assignedMissionsDB.getEnrichedMissionsForCompany(currentUser.id);
-        
-        const hireRequests = await hireRequestsDB.getHireRequestsByCompanyId(currentUser.id);
-        const enrichedHireRequests = await Promise.all(
-          hireRequests.map(request => enrichHireRequest(request, userRole))
-        );
-        const hireRequestMissions = enrichedHireRequests
-          .map(request => convertHireRequestToMissionFormat(request, userRole))
-          .filter(Boolean);
-        
-        const applicationRequests = await hireRequestsDB.getApplicationRequestsByCompanyId(currentUser.id);
-        const enrichedApplicationRequests = await Promise.all(
-          applicationRequests.map(request => enrichHireRequest(request, userRole))
-        );
-        const applicationRequestMissions = enrichedApplicationRequests
-          .map(request => convertApplicationRequestToMissionFormat(request, userRole))
-          .filter(Boolean);
-        
-        enrichedMissions = [...enrichedMissions, ...hireRequestMissions, ...applicationRequestMissions];
-      } else if (userRole === 'expert') {
-        enrichedMissions = await assignedMissionsDB.getEnrichedMissionsForExpert(currentUser.id);
-        
-        const hireRequests = await hireRequestsDB.getHireRequestsByExpertId(currentUser.id);
-        const enrichedHireRequests = await Promise.all(
-          hireRequests.map(request => enrichHireRequest(request, userRole))
-        );
-        const hireRequestMissions = enrichedHireRequests
-          .map(request => convertHireRequestToMissionFormat(request, userRole))
-          .filter(Boolean);
-        
-        const applicationRequests = await hireRequestsDB.getApplicationRequestsByExpertId(currentUser.id);
-        const enrichedApplicationRequests = await Promise.all(
-          applicationRequests.map(request => enrichHireRequest(request, userRole))
-        );
-        const applicationRequestMissions = enrichedApplicationRequests
-          .map(request => convertApplicationRequestToMissionFormat(request, userRole))
-          .filter(Boolean);
-        
-        enrichedMissions = [...enrichedMissions, ...hireRequestMissions, ...applicationRequestMissions];
-      }
-
-      setMissions(enrichedMissions);
+      const [assignedRes, hireRes, applicationRes] = await Promise.all([
+        api.get('/api/assigned-missions'),
+        api.get('/api/hire-requests?type=hire'),
+        api.get('/api/hire-requests?type=application'),
+      ]);
+      const assigned = (assignedRes.data || []).map(assignedToCard);
+      const hireCards = (hireRes.data || [])
+        .map((r) => convertHireRequestToMissionFormat({ ...r, updatedAt: r.updatedAt }, userRole))
+        .filter(Boolean);
+      const applicationCards = (applicationRes.data || [])
+        .map((r) => convertApplicationRequestToMissionFormat({ ...r, updatedAt: r.updatedAt }, userRole))
+        .filter(Boolean);
+      setMissions([...assigned, ...hireCards, ...applicationCards]);
     } catch (error) {
       console.error('Error loading missions:', error);
       setMissions([]);

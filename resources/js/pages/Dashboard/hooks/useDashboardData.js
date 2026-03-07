@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import { dashboardDB } from '../db';
-import { assignedMissionsDB } from '../../Missions/db';
-import { db } from '../../../utils/database';
+import { api } from '../../../utils/api';
 import { 
   prepareChartData, 
   prepareBarChartData, 
@@ -24,7 +22,7 @@ export const useCompanyDashboardData = (months, t, locale) => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const financialData = await dashboardDB.getCompanyFinancialData();
+        const { data: financialData } = await api.get('/api/dashboard/company-financial');
         
         if (financialData) {
           setKpiData({
@@ -118,7 +116,7 @@ export const useExpertDashboardData = (months, t, locale) => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const stats = await dashboardDB.getExpertStats();
+        const { data: stats } = await api.get('/api/dashboard/expert-stats');
         
         if (stats) {
           setExpertStats({
@@ -154,10 +152,9 @@ export const useExpertDashboardData = (months, t, locale) => {
           }
         }
 
-        const currentUser = await db.get('currentUser');
-        if (currentUser && currentUser.role === 'expert') {
-          const enrichedMissions = await assignedMissionsDB.getEnrichedMissionsForExpert(currentUser.id);
-          const sortedMissions = enrichedMissions
+        const { data: assignedList } = await api.get('/api/assigned-missions');
+        if (assignedList && assignedList.length > 0) {
+          const sortedMissions = assignedList
             .filter(am => am.mission)
             .sort((a, b) => {
               const dateA = new Date(a.updatedAt || a.createdAt);

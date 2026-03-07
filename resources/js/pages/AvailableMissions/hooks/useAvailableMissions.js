@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { availableMissionsDB } from '../db';
+import { api } from '../../../utils/api';
 import { filterMissions } from '../utils';
 import useDebounce from '../../../hooks/useDebounce';
 
@@ -25,8 +25,8 @@ export const useAvailableMissions = () => {
     const loadMissions = async () => {
       try {
         setLoading(true);
-        const allMissions = await availableMissionsDB.getAllAvailableMissions();
-        setMissions(allMissions);
+        const { data } = await api.get('/api/available-missions');
+        setMissions(data || []);
       } catch (error) {
         console.error('Error loading available missions:', error);
         setMissions([]);
