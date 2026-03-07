@@ -21,9 +21,4 @@ class AuthPageController extends Controller
     {
         return Inertia::render('ForgotPassword/ForgotPassword');
     }
-
-    public function trial()
-    {
-        return Inertia::render('Trial/Trial');
-    }
 }

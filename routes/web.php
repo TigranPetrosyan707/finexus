@@ -33,7 +33,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/signup', [AuthPageController::class, 'signup']);
     Route::get('/forgot-password', [AuthPageController::class, 'forgotPassword']);
-    Route::get('/trial', [AuthPageController::class, 'trial']);
     Route::post('/users/store', [UserController::class, 'store']);
     Route::post('/users/check-email', [UserController::class, 'checkEmail']);
 });

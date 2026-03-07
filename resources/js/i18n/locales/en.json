@@ -377,22 +377,6 @@
     "emailInvalid": "Please enter a valid email address.",
     "success": "Your information has been successfully updated."
   },
-  "trial": {
-    "title": "30-Day Free Trial",
-    "header": "30-Day Free Trial",
-    "subtitle": "Start Trial",
-    "description": "Create a test access in less than 30 seconds.",
-    "firstname": "Your First Name",
-    "lastname": "Your Last Name",
-    "email": "Email Address",
-    "password": "Password",
-    "company": "Company Name (optional)",
-    "submit": "Activate My Free Trial",
-    "hasAccount": "Already registered?",
-    "login": "Login",
-    "fillRequired": "Please fill in all required fields",
-    "success": "Your 30-day free trial has been successfully activated!"
-  },
   "searchExperts": {
     "title": "Search Experts",
     "subtitle": "Find the perfect financial expert for your company",

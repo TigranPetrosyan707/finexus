@@ -12,7 +12,6 @@ const pagesWithoutSidebar = [
     'Login/Login',
     'Signup/Signup',
     'ForgotPassword/ForgotPassword',
-    'Trial/Trial',
 ];
 
 createInertiaApp({

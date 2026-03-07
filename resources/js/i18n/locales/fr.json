@@ -377,22 +377,6 @@
     "emailInvalid": "Veuillez entrer une adresse email valide.",
     "success": "Vos informations ont été mises à jour avec succès."
   },
-  "trial": {
-    "title": "Essai gratuit 30 jours",
-    "header": "Essai gratuit 30 jours",
-    "subtitle": "Commencer l'essai",
-    "description": "Créer un accès test en moins de 30 secondes.",
-    "firstname": "Votre prénom",
-    "lastname": "Votre nom",
-    "email": "Adresse email",
-    "password": "Mot de passe",
-    "company": "Nom de l'entreprise (optionnel)",
-    "submit": "Activer mon essai gratuit",
-    "hasAccount": "Déjà inscrit ?",
-    "login": "Se connecter",
-    "fillRequired": "Veuillez remplir tous les champs obligatoires",
-    "success": "Votre essai gratuit de 30 jours a été activé avec succès !"
-  },
   "searchExperts": {
     "title": "Rechercher des experts",
     "subtitle": "Trouvez l'expert financier idéal pour votre entreprise",
