@@ -53,7 +53,10 @@ function buildPayload(selectedRole, data) {
     payload.experience = data.experience ?? '';
     payload.dailyRate = data.dailyRate != null && data.dailyRate !== '' ? Number(data.dailyRate) : null;
     payload.linkedin = data.linkedin || null;
-    if (data.resume && (data.resume[0] instanceof File || data.resume instanceof File)) {
+    const workExp = Array.isArray(data.workExperience) ? data.workExperience : [];
+    const hasFile = data.resume && (data.resume[0] instanceof File || data.resume instanceof File);
+    payload.workExperience = workExp.length ? (hasFile ? JSON.stringify(workExp) : workExp) : [];
+    if (hasFile) {
       payload.resume = data.resume[0] || data.resume;
     }
   }

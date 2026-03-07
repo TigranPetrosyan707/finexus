@@ -41,6 +41,7 @@ class UserController extends Controller
             $rules['dailyRate'] = ['nullable', 'numeric', 'min:0'];
             $rules['linkedin'] = ['nullable', 'string', 'max:500', 'url'];
             $rules['resume'] = ['nullable', 'file', 'max:10240', 'mimes:pdf,doc,docx'];
+            $rules['workExperience'] = ['nullable'];
         }
 
         $data = $request->validate($rules);
@@ -88,10 +89,27 @@ class UserController extends Controller
                 'linkedin' => $data['linkedin'] ?? null,
                 'resume_path' => $resumePath,
             ];
+            $workExperienceRaw = $data['workExperience'] ?? [];
+            if (is_string($workExperienceRaw)) {
+                $workExperienceRaw = json_decode($workExperienceRaw, true) ?: [];
+            }
+            $workExperience = [];
+            foreach (is_array($workExperienceRaw) ? $workExperienceRaw : [] as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+                $workExperience[] = [
+                    'companyName' => $item['companyName'] ?? '',
+                    'experience' => $item['experience'] ?? '',
+                    'role' => $item['role'] ?? '',
+                    'summary' => $item['summary'] ?? '',
+                ];
+            }
             $user->professional_info = [
                 'profession' => $data['sector'] ?? '',
                 'experience' => $data['experience'] ?? null,
                 'dailyRate' => isset($data['dailyRate']) ? (float) $data['dailyRate'] : null,
+                'workExperience' => $workExperience,
             ];
         }
 

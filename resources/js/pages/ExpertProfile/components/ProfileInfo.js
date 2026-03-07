@@ -57,6 +57,41 @@ const ProfileInfo = ({ profile, t, i18n }) => {
         </div>
       )}
 
+      {profile.workExperience && profile.workExperience.length > 0 && (
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('signup.expert.workExperience')}</label>
+          <div className="space-y-4">
+            {profile.workExperience.map((item, index) => (
+              <div key={index} className="p-4 rounded-lg border border-gray-200 bg-gray-50">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  {item.companyName && (
+                    <div>
+                      <span className="font-medium text-gray-700">{t('signup.expert.companyName')}: </span>
+                      <span className="text-gray-900">{item.companyName}</span>
+                    </div>
+                  )}
+                  {item.role && (
+                    <div>
+                      <span className="font-medium text-gray-700">{t('signup.expert.role')}: </span>
+                      <span className="text-gray-900">{item.role}</span>
+                    </div>
+                  )}
+                  {item.experience && (
+                    <div>
+                      <span className="font-medium text-gray-700">{t('signup.expert.experienceDuration')}: </span>
+                      <span className="text-gray-900">{item.experience}</span>
+                    </div>
+                  )}
+                </div>
+                {item.summary && (
+                  <p className="text-gray-700 mt-2 text-sm">{item.summary}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {profile.specialties && profile.specialties.length > 0 && (
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">{t('expertProfile.specialties')}</label>

@@ -17,7 +17,7 @@ export const formatExpertProfile = (expert, stats = {}) => {
     dailyRate: professionalInfo.dailyRate || 0,
     specialties: expert.specialties || [],
     description: expert.description || '',
-    workExperience: expert.workExperience || [],
+    workExperience: expert.professionalInfo?.workExperience || expert.workExperience || [],
     verified: expert.verified || false,
     rating: expert.rating || 0,
     reviews: expert.reviews || 0,
