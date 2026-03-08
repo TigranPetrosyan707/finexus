@@ -1,50 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import React from 'react';
+import { router, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaEuroSign, FaClock, FaMapMarkerAlt, FaCalendarAlt, FaArrowLeft, FaBriefcase } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
-import LoadingSpinner from '../../../components/UI/LoadingSpinner/LoadingSpinner';
 import Button from '../../../components/UI/Button/Button';
 import { formatMissionDate, getSectorOptions } from '../../PostMission/utils';
-import { api } from '../../../utils/api';
 
 const MissionViewFromRequest = ({ id }) => {
   const { t, i18n } = useTranslation();
-  const [mission, setMission] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadMission = async () => {
-      if (!id) {
-        setLoading(false);
-        return;
-      }
-      try {
-        setLoading(true);
-        const { data } = await api.get(`/api/available-missions/${id}`);
-        setMission(data || null);
-      } catch (error) {
-        console.error('Error loading mission:', error);
-        setMission(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadMission();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <div className="relative overflow-hidden min-h-screen" style={{ backgroundColor: colors.sectionGray }}>
-        <div className="relative z-10 container mx-auto px-4 py-8">
-          <div className="py-16">
-            <LoadingSpinner fullScreen={false} />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const { props } = usePage();
+  const mission = props.mission ?? null;
 
   if (!mission) {
     return (
@@ -74,8 +39,8 @@ const MissionViewFromRequest = ({ id }) => {
       <div className="relative z-10 container mx-auto px-4 py-8">
         <Button
           onClick={() => router.visit('/missions')}
-          variant="secondary"
           className="mb-6 flex items-center space-x-2"
+          style={{ backgroundColor: colors.linkHover, color: '#fff' }}
         >
           <FaArrowLeft className="w-4 h-4" />
           <span>{t('missions.back') || 'Back to Missions'}</span>
