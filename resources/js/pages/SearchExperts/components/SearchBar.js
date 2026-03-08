@@ -4,12 +4,18 @@ import { FaSearch, FaFilter } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
 import Input from '../../../components/UI/Input/Input';
 
-const SearchBar = ({ searchQuery, onSearchChange, onToggleFilters, showFilters, activeFiltersCount }) => {
+const SearchBar = ({ searchQuery, onSearchChange, onSearchSubmit, onToggleFilters, showFilters, activeFiltersCount }) => {
   const { t } = useTranslation();
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-6">
-      <div className="relative flex items-center gap-3">
+      <form
+        className="relative flex items-center gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSearchSubmit?.();
+        }}
+      >
         <div className="relative flex-1">
           <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
@@ -34,7 +40,7 @@ const SearchBar = ({ searchQuery, onSearchChange, onToggleFilters, showFilters, 
             </span>
           )}
         </button>
-      </div>
+      </form>
     </div>
   );
 };

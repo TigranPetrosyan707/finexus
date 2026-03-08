@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaSearch } from 'react-icons/fa';
 import { MdPersonSearch } from 'react-icons/md';
 import { colors } from '../../constants/colors';
+import Empty from '../../components/Empty/Empty';
 import { useSearchExperts } from './hooks/useSearchExperts';
 import SearchBar from './components/SearchBar';
 import Filters from './components/Filters';
@@ -14,9 +16,9 @@ const SearchExperts = () => {
   const {
     searchQuery,
     setSearchQuery,
+    submitSearch,
     experts,
-    loading,
-    filteredExperts,
+    totalExperts,
     filters,
     handleFilterChange,
     applyFilters,
@@ -30,6 +32,8 @@ const SearchExperts = () => {
     hasActiveVerifiedFilter,
     activeFiltersCount
   } = useSearchExperts();
+
+  const hasDataInDb = totalExperts > 0;
 
   return (
     <div className="relative overflow-hidden min-h-screen" style={{ backgroundColor: colors.sectionGray }}>
@@ -55,7 +59,7 @@ const SearchExperts = () => {
           </div>
         </div>
 
-        {loading ? null : experts.length === 0 ? (
+        {!hasDataInDb ? (
           <EmptyExperts t={t} />
         ) : (
           <div className="flex flex-col lg:flex-row gap-6">
@@ -79,12 +83,21 @@ const SearchExperts = () => {
               <SearchBar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                onSearchSubmit={submitSearch}
                 onToggleFilters={() => setShowFilters(!showFilters)}
                 showFilters={showFilters}
                 activeFiltersCount={activeFiltersCount}
               />
 
-              <ExpertList experts={filteredExperts} t={t} />
+              {experts.length === 0 ? (
+                <Empty
+                  icon={FaSearch}
+                  title={t('searchExperts.noResults')}
+                  description={t('searchExperts.noResultsDescription')}
+                />
+              ) : (
+                <ExpertList experts={experts} t={t} />
+              )}
             </div>
           </div>
         )}

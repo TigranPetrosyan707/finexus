@@ -1,140 +1,94 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { api } from '../../../utils/api';
-import { filterExperts, formatExpertData } from '../utils';
-import useDebounce from '../../../hooks/useDebounce';
+import { useState, useEffect } from 'react';
+import { router, usePage } from '@inertiajs/react';
+import { formatExpertData } from '../utils';
 
 const DEFAULT_FILTERS = {
+  search: '',
   minPrice: 0,
   maxPrice: 1000,
   minExperience: 0,
   maxExperience: 11,
-  verifiedOnly: false
+  verifiedOnly: false,
 };
 
 export const useSearchExperts = () => {
-  const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 800);
-  const [experts, setExperts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
+  const { props } = usePage();
+  const initialExperts = props.experts || [];
+  const initialFilters = props.filters || DEFAULT_FILTERS;
+  const totalExperts = typeof props.totalExperts === 'number' ? props.totalExperts : 0;
+
+  const [filters, setFilters] = useState(initialFilters);
 
   useEffect(() => {
-    const loadExperts = async () => {
-      try {
-        setLoading(true);
-        const { data: expertsData } = await api.get('/api/experts');
-        const formattedExperts = (expertsData || []).map(formatExpertData);
-        setExperts(formattedExperts);
-      } catch (error) {
-        console.error('Error loading experts:', error);
-        setExperts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setFilters(initialFilters);
+  }, [initialFilters.search, initialFilters.minPrice, initialFilters.maxPrice, initialFilters.minExperience, initialFilters.maxExperience, initialFilters.verifiedOnly]);
 
-    loadExperts();
-  }, []);
-
-  const filteredExperts = useMemo(() => {
-    if (loading) return [];
-    return filterExperts(experts, debouncedSearchQuery, appliedFilters, t);
-  }, [experts, debouncedSearchQuery, appliedFilters, t, loading]);
+  const experts = initialExperts.map(formatExpertData);
 
   const handleFilterChange = (field, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFilters(prev => ({ ...prev, [field]: value }));
   };
 
   const applyFilters = () => {
-    setAppliedFilters({ ...filters });
+    router.get('/search-experts', filters, { preserveState: false });
   };
 
   const resetFilters = () => {
     setFilters(DEFAULT_FILTERS);
-    setAppliedFilters(DEFAULT_FILTERS);
+    router.get('/search-experts', DEFAULT_FILTERS, { preserveState: false });
   };
 
   const resetPriceFilter = () => {
-    const updatedFilters = {
-      ...filters,
-      minPrice: DEFAULT_FILTERS.minPrice,
-      maxPrice: DEFAULT_FILTERS.maxPrice
-    };
-    setFilters(updatedFilters);
-    setAppliedFilters(updatedFilters);
+    const next = { ...filters, minPrice: DEFAULT_FILTERS.minPrice, maxPrice: DEFAULT_FILTERS.maxPrice };
+    setFilters(next);
+    router.get('/search-experts', next, { preserveState: false });
   };
 
   const resetExperienceFilter = () => {
-    const updatedFilters = {
-      ...filters,
-      minExperience: DEFAULT_FILTERS.minExperience,
-      maxExperience: DEFAULT_FILTERS.maxExperience
-    };
-    setFilters(updatedFilters);
-    setAppliedFilters(updatedFilters);
+    const next = { ...filters, minExperience: DEFAULT_FILTERS.minExperience, maxExperience: DEFAULT_FILTERS.maxExperience };
+    setFilters(next);
+    router.get('/search-experts', next, { preserveState: false });
   };
 
   const resetVerifiedFilter = () => {
-    const updatedFilters = {
-      ...filters,
-      verifiedOnly: DEFAULT_FILTERS.verifiedOnly
-    };
-    setFilters(updatedFilters);
-    setAppliedFilters(updatedFilters);
+    const next = { ...filters, verifiedOnly: DEFAULT_FILTERS.verifiedOnly };
+    setFilters(next);
+    router.get('/search-experts', next, { preserveState: false });
   };
 
-  const hasActiveFilters = useMemo(() => {
-    return (filters.minPrice !== DEFAULT_FILTERS.minPrice || 
-            filters.maxPrice !== DEFAULT_FILTERS.maxPrice) || 
-           (filters.minExperience !== DEFAULT_FILTERS.minExperience || 
-            filters.maxExperience !== DEFAULT_FILTERS.maxExperience) || 
-           filters.verifiedOnly;
-  }, [filters]);
+  const hasActiveFilters =
+    (filters.search || '') !== '' ||
+    filters.minPrice !== DEFAULT_FILTERS.minPrice ||
+    filters.maxPrice !== DEFAULT_FILTERS.maxPrice ||
+    filters.minExperience !== DEFAULT_FILTERS.minExperience ||
+    filters.maxExperience !== DEFAULT_FILTERS.maxExperience ||
+    filters.verifiedOnly;
 
-  const hasActivePriceFilter = useMemo(() => {
-    return filters.minPrice !== DEFAULT_FILTERS.minPrice || 
-           filters.maxPrice !== DEFAULT_FILTERS.maxPrice;
-  }, [filters]);
+  const hasActivePriceFilter = filters.minPrice !== DEFAULT_FILTERS.minPrice || filters.maxPrice !== DEFAULT_FILTERS.maxPrice;
+  const hasActiveExperienceFilter = filters.minExperience !== DEFAULT_FILTERS.minExperience || filters.maxExperience !== DEFAULT_FILTERS.maxExperience;
+  const hasActiveVerifiedFilter = filters.verifiedOnly;
 
-  const hasActiveExperienceFilter = useMemo(() => {
-    return filters.minExperience !== DEFAULT_FILTERS.minExperience || 
-           filters.maxExperience !== DEFAULT_FILTERS.maxExperience;
-  }, [filters]);
+  let activeFiltersCount = 0;
+  if ((filters.search || '') !== '') activeFiltersCount++;
+  if (filters.minPrice !== DEFAULT_FILTERS.minPrice || filters.maxPrice !== DEFAULT_FILTERS.maxPrice) activeFiltersCount++;
+  if (filters.minExperience !== DEFAULT_FILTERS.minExperience || filters.maxExperience !== DEFAULT_FILTERS.maxExperience) activeFiltersCount++;
+  if (filters.verifiedOnly) activeFiltersCount++;
 
-  const hasActiveVerifiedFilter = useMemo(() => {
-    return filters.verifiedOnly;
-  }, [filters]);
+  const setSearchQuery = (value) => setFilters(prev => ({ ...prev, search: value }));
+  const searchQuery = filters.search || '';
 
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (appliedFilters.minPrice !== DEFAULT_FILTERS.minPrice || 
-        appliedFilters.maxPrice !== DEFAULT_FILTERS.maxPrice) {
-      count++;
-    }
-    if (appliedFilters.minExperience !== DEFAULT_FILTERS.minExperience || 
-        appliedFilters.maxExperience !== DEFAULT_FILTERS.maxExperience) {
-      count++;
-    }
-    if (appliedFilters.verifiedOnly) {
-      count++;
-    }
-    return count;
-  }, [appliedFilters]);
+  const submitSearch = () => {
+    router.get('/search-experts', { ...filters, search: filters.search }, { preserveState: false });
+  };
 
   return {
     searchQuery,
     setSearchQuery,
+    submitSearch,
     experts,
-    loading,
-    filteredExperts,
+    totalExperts,
+    loading: false,
     filters,
-    appliedFilters,
     handleFilterChange,
     applyFilters,
     resetFilters,
@@ -145,7 +99,6 @@ export const useSearchExperts = () => {
     hasActivePriceFilter,
     hasActiveExperienceFilter,
     hasActiveVerifiedFilter,
-    activeFiltersCount
+    activeFiltersCount,
   };
 };
-
