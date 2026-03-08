@@ -153,16 +153,16 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {errors.root && (
+            {errors.root?.message ? (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {errors.root.message}
               </div>
-            )}
-            {errors.role && (
+            ) : null}
+            {errors.role?.message ? (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {errors.role.message}
               </div>
-            )}
+            ) : null}
             <div>
               <Input
                 id="loginEmail"
