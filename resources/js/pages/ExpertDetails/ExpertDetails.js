@@ -13,7 +13,7 @@ import Button from '../../components/UI/Button/Button';
 
 const ExpertDetails = ({ id }) => {
   const { t, i18n } = useTranslation();
-  const { profile, loading } = useExpertDetails(id, t);
+  const { profile, loading } = useExpertDetails(id);
   const {
     loading: hireRequestLoading,
     isSending,
@@ -91,7 +91,7 @@ const ExpertDetails = ({ id }) => {
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="mb-6">
           <Button
-            onClick={() => navigate('/search-experts')}
+            onClick={() => router.visit('/search-experts')}
             className="flex items-center space-x-2 mb-4"
             style={{ backgroundColor: colors.linkHover, color: '#fff' }}
           >
