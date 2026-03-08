@@ -3,6 +3,7 @@ import { router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaEuroSign, FaClock, FaMapMarkerAlt, FaCalendarAlt, FaArrowLeft, FaBriefcase } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
+import LoadingSpinner from '../../../components/UI/LoadingSpinner/LoadingSpinner';
 import Button from '../../../components/UI/Button/Button';
 import { formatMissionDate, getSectorOptions } from '../../PostMission/utils';
 import { api } from '../../../utils/api';
@@ -37,8 +38,8 @@ const MissionViewFromRequest = ({ id }) => {
     return (
       <div className="relative overflow-hidden min-h-screen" style={{ backgroundColor: colors.sectionGray }}>
         <div className="relative z-10 container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <p className="text-gray-600">{t('common.loading') || 'Loading...'}</p>
+          <div className="py-16">
+            <LoadingSpinner fullScreen={false} />
           </div>
         </div>
       </div>

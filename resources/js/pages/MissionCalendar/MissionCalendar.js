@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { FaCalendarAlt } from 'react-icons/fa';
 import { colors } from '../../constants/colors';
+import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import { useMissionCalendar } from './hooks/useMissionCalendar';
 import MissionCalendarView from './components/MissionCalendarView';
 import MissionList from './components/MissionList';
@@ -49,8 +50,8 @@ const MissionCalendar = () => {
         </div>
 
         {loading ? (
-          <div className="text-center py-16">
-            <p className="text-gray-600">{t('common.loading') || 'Loading...'}</p>
+          <div className="py-16">
+            <LoadingSpinner fullScreen={false} />
           </div>
         ) : missions.length === 0 ? (
           <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-200 text-center">
