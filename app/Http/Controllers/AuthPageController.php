@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 
 class AuthPageController extends Controller
 {
-    public function login()
+    public function login(Request $request)
     {
-        return Inertia::render('Login/Login');
+        $errors = $request->session()->get('errors');
+        $errorBag = $errors ? $errors->getMessages() : [];
+        return Inertia::render('Login/Login', ['errors' => $errorBag]);
     }
 
     public function signup()
