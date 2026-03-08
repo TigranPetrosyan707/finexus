@@ -12,9 +12,10 @@ const AvailableMissions = () => {
   const [showFilters, setShowFilters] = useState(true);
   const {
     missions,
-    allMissions,
+    totalMissions,
     searchQuery,
     setSearchQuery,
+    submitSearch,
     filters,
     handleFilterChange,
     applyFilters,
@@ -30,6 +31,8 @@ const AvailableMissions = () => {
     hasActiveSectionFilter,
     activeFiltersCount,
   } = useAvailableMissions();
+
+  const hasDataInDb = totalMissions > 0;
 
   return (
     <div className="relative overflow-hidden min-h-screen" style={{ backgroundColor: colors.sectionGray }}>
@@ -56,7 +59,7 @@ const AvailableMissions = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {allMissions && allMissions.length > 0 && (
+          {hasDataInDb && (
             <Filters
               filters={filters}
               onFilterChange={handleFilterChange}
@@ -77,14 +80,15 @@ const AvailableMissions = () => {
           )}
 
           <div className="flex-1">
-            {allMissions && allMissions.length > 0 && (
+            {hasDataInDb && (
               <SearchBar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                onSearchSubmit={submitSearch}
                 onToggleFilters={() => setShowFilters(!showFilters)}
                 showFilters={showFilters}
                 activeFiltersCount={activeFiltersCount}
-                hasMissions={allMissions && allMissions.length > 0}
+                hasMissions
               />
             )}
 

@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { api } from '../../../utils/api';
-import { filterMissions } from '../utils';
+import { useState, useEffect, useRef } from 'react';
+import { router, usePage } from '@inertiajs/react';
 import useDebounce from '../../../hooks/useDebounce';
 
 const DEFAULT_FILTERS = {
+  search: '',
   minBudget: 0,
   maxBudget: 1000,
   minDuration: 0,
@@ -13,125 +12,116 @@ const DEFAULT_FILTERS = {
 };
 
 export const useAvailableMissions = () => {
-  const { t } = useTranslation();
-  const [loading, setLoading] = useState(true);
-  const [missions, setMissions] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 800);
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
+  const { props } = usePage();
+  const initialMissions = props.missions || [];
+  const initialFilters = props.filters || DEFAULT_FILTERS;
+
+  const [filters, setFilters] = useState(initialFilters);
+  const searchQuery = filters.search || '';
+  const debouncedSearch = useDebounce(searchQuery, 500);
+  const filtersRef = useRef(filters);
+  const skipFirstSearchRef = useRef(true);
+
+  filtersRef.current = filters;
 
   useEffect(() => {
-    const loadMissions = async () => {
-      try {
-        setLoading(true);
-        const { data } = await api.get('/api/available-missions');
-        setMissions(data || []);
-      } catch (error) {
-        console.error('Error loading available missions:', error);
-        setMissions([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setFilters(initialFilters);
+  }, [
+    initialFilters.search,
+    initialFilters.minBudget,
+    initialFilters.maxBudget,
+    initialFilters.minDuration,
+    initialFilters.location,
+    initialFilters.section
+  ]);
 
-    loadMissions();
-  }, []);
+  useEffect(() => {
+    if (skipFirstSearchRef.current) {
+      skipFirstSearchRef.current = false;
+      return;
+    }
+    router.get('/available-missions', { ...filtersRef.current, search: debouncedSearch }, { preserveState: false });
+  }, [debouncedSearch]);
 
-  const filteredMissions = useMemo(() => {
-    if (loading) return [];
-    return filterMissions(missions, debouncedSearchQuery, appliedFilters, t);
-  }, [missions, debouncedSearchQuery, appliedFilters, t, loading]);
+  const missions = initialMissions;
+  const totalMissions = typeof props.totalMissions === 'number' ? props.totalMissions : 0;
 
   const handleFilterChange = (field, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFilters(prev => ({ ...prev, [field]: value }));
   };
 
   const applyFilters = () => {
-    setAppliedFilters({ ...filters });
+    router.get('/available-missions', filters, { preserveState: false });
   };
 
   const resetFilters = () => {
-    setFilters(DEFAULT_FILTERS);
-    setAppliedFilters(DEFAULT_FILTERS);
+    const next = {
+      ...filters,
+      minBudget: DEFAULT_FILTERS.minBudget,
+      maxBudget: DEFAULT_FILTERS.maxBudget,
+      minDuration: DEFAULT_FILTERS.minDuration,
+      location: DEFAULT_FILTERS.location,
+      section: DEFAULT_FILTERS.section,
+    };
+    setFilters(next);
+    router.get('/available-missions', next, { preserveState: false });
   };
 
   const resetBudgetFilter = () => {
-    const newFilters = {
-      ...filters,
-      minBudget: DEFAULT_FILTERS.minBudget,
-      maxBudget: DEFAULT_FILTERS.maxBudget
-    };
-    setFilters(newFilters);
-    setAppliedFilters(newFilters);
+    const next = { ...filters, minBudget: DEFAULT_FILTERS.minBudget, maxBudget: DEFAULT_FILTERS.maxBudget };
+    setFilters(next);
+    router.get('/available-missions', next, { preserveState: false });
   };
 
   const resetDurationFilter = () => {
-    const newFilters = {
-      ...filters,
-      minDuration: DEFAULT_FILTERS.minDuration
-    };
-    setFilters(newFilters);
-    setAppliedFilters(newFilters);
+    const next = { ...filters, minDuration: DEFAULT_FILTERS.minDuration };
+    setFilters(next);
+    router.get('/available-missions', next, { preserveState: false });
   };
 
   const resetLocationFilter = () => {
-    const newFilters = {
-      ...filters,
-      location: DEFAULT_FILTERS.location
-    };
-    setFilters(newFilters);
-    setAppliedFilters(newFilters);
+    const next = { ...filters, location: DEFAULT_FILTERS.location };
+    setFilters(next);
+    router.get('/available-missions', next, { preserveState: false });
   };
 
   const resetSectionFilter = () => {
-    const newFilters = {
-      ...filters,
-      section: DEFAULT_FILTERS.section
-    };
-    setFilters(newFilters);
-    setAppliedFilters(newFilters);
+    const next = { ...filters, section: DEFAULT_FILTERS.section };
+    setFilters(next);
+    router.get('/available-missions', next, { preserveState: false });
   };
 
-  const hasActiveFilters = useMemo(() => {
-    return (filters.minBudget !== DEFAULT_FILTERS.minBudget || filters.maxBudget !== DEFAULT_FILTERS.maxBudget) ||
-      filters.minDuration > DEFAULT_FILTERS.minDuration ||
-      filters.location !== DEFAULT_FILTERS.location ||
-      filters.section !== DEFAULT_FILTERS.section;
-  }, [filters]);
+  const hasActiveFilters =
+    filters.minBudget !== DEFAULT_FILTERS.minBudget ||
+    filters.maxBudget !== DEFAULT_FILTERS.maxBudget ||
+    filters.minDuration > DEFAULT_FILTERS.minDuration ||
+    filters.location !== DEFAULT_FILTERS.location ||
+    filters.section !== DEFAULT_FILTERS.section;
 
-  const hasActiveBudgetFilter = useMemo(() => {
-    return filters.minBudget !== DEFAULT_FILTERS.minBudget || filters.maxBudget !== DEFAULT_FILTERS.maxBudget;
-  }, [filters]);
+  const hasActiveBudgetFilter = filters.minBudget !== DEFAULT_FILTERS.minBudget || filters.maxBudget !== DEFAULT_FILTERS.maxBudget;
+  const hasActiveDurationFilter = filters.minDuration > DEFAULT_FILTERS.minDuration;
+  const hasActiveLocationFilter = filters.location !== DEFAULT_FILTERS.location;
+  const hasActiveSectionFilter = filters.section !== DEFAULT_FILTERS.section;
 
-  const hasActiveDurationFilter = useMemo(() => {
-    return filters.minDuration > DEFAULT_FILTERS.minDuration;
-  }, [filters]);
+  const activeFiltersCount =
+    ((filters.minBudget !== 0 || filters.maxBudget !== 1000) ? 1 : 0) +
+    (filters.minDuration > 0 ? 1 : 0) +
+    (filters.location !== 'all' ? 1 : 0) +
+    (filters.section !== 'all' ? 1 : 0);
 
-  const hasActiveLocationFilter = useMemo(() => {
-    return filters.location !== DEFAULT_FILTERS.location;
-  }, [filters]);
+  const setSearchQuery = (value) => setFilters(prev => ({ ...prev, search: value }));
 
-  const hasActiveSectionFilter = useMemo(() => {
-    return filters.section !== DEFAULT_FILTERS.section;
-  }, [filters]);
-
-  const activeFiltersCount = ((appliedFilters.minBudget !== 0 || appliedFilters.maxBudget !== 1000) ? 1 : 0) + 
-    (appliedFilters.minDuration > 0 ? 1 : 0) + 
-    (appliedFilters.location !== 'all' ? 1 : 0) + 
-    (appliedFilters.section !== 'all' ? 1 : 0);
+  const submitSearch = () => {
+    router.get('/available-missions', { ...filters, search: filters.search }, { preserveState: false });
+  };
 
   return {
-    loading,
-    missions: filteredMissions,
-    allMissions: missions,
+    missions,
+    totalMissions,
     searchQuery,
     setSearchQuery,
+    submitSearch,
     filters,
-    appliedFilters,
     handleFilterChange,
     applyFilters,
     resetFilters,
@@ -147,4 +137,3 @@ export const useAvailableMissions = () => {
     activeFiltersCount,
   };
 };
-

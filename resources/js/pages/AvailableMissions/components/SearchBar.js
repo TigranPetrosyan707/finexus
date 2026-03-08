@@ -4,7 +4,7 @@ import { FaSearch, FaFilter } from 'react-icons/fa';
 import { colors } from '../../../constants/colors';
 import Input from '../../../components/UI/Input/Input';
 
-const SearchBar = ({ searchQuery, onSearchChange, onToggleFilters, showFilters, activeFiltersCount, hasMissions }) => {
+const SearchBar = ({ searchQuery, onSearchChange, onSearchSubmit, onToggleFilters, showFilters, activeFiltersCount, hasMissions }) => {
   const { t } = useTranslation();
 
   return (
@@ -17,6 +17,7 @@ const SearchBar = ({ searchQuery, onSearchChange, onToggleFilters, showFilters, 
             placeholder={t('availableMissions.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit?.()}
             className="w-full pl-12 pr-4 py-3"
           />
         </div>
