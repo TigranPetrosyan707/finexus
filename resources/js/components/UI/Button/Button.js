@@ -11,7 +11,7 @@ const Button = ({
   disabled = false,
   ...props
 }) => {
-  const baseClasses = 'px-6 py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'cursor-pointer px-6 py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantClasses = {
     primary: 'font-bold shadow-md hover:shadow-lg',

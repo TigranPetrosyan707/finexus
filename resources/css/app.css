@@ -45,8 +45,13 @@
   }
 
   html {
-    /* Smooth scrolling for better UX */
     scroll-behavior: smooth;
+  }
+
+  button,
+  a,
+  [role="button"] {
+    cursor: pointer;
   }
 }
 
