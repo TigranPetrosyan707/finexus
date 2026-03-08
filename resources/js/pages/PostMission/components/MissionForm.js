@@ -255,11 +255,11 @@ const MissionForm = ({
                             disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                             className="rounded-lg"
                             styles={{
-                              day_selected: {
+                              selected: {
                                 backgroundColor: colors.linkHover,
                                 color: 'white',
                               },
-                              day_today: {
+                              today: {
                                 color: colors.linkHover,
                                 fontWeight: 'bold',
                               },

@@ -5,8 +5,9 @@ import { AuthProvider } from "./context/AuthContext.js";
 import { SidebarProvider } from "./context/SidebarContext.js";
 import AuthSync from "./components/AuthSync.js";
 import AdminLayout from "./components/Layout/AdminLayout.js";
+import 'react-day-picker/style.css';
 import './i18n/config.js';
-import '../css/app.css'
+import '../css/app.css';
 
 const pagesWithoutSidebar = [
     'Login/Login',

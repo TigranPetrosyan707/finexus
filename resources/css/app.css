@@ -25,27 +25,10 @@
 /*  '100%': { transform: 'translateY(0)', opacity: '1' };*/
 /*}*/
 
-.rdp {
-  --rdp-cell-size: 40px;
+.rdp-root {
   --rdp-accent-color: #72c2cb;
-  --rdp-background-color: #e8f4f8;
-  --rdp-accent-color-dark: #1a4d5c;
-  --rdp-background-color-dark: #1e3a8a;
-  --rdp-outline: 2px solid var(--rdp-accent-color);
-  --rdp-outline-selected: 3px solid var(--rdp-accent-color);
-  margin: 0;
-}
-
-.rdp-day_selected,
-.rdp-day_selected:focus-visible,
-.rdp-day_selected:hover {
-  background-color: #72c2cb;
-  color: white;
-}
-
-.rdp-day_today {
-  color: #72c2cb;
-  font-weight: bold;
+  --rdp-accent-background-color: #e8f4f8;
+  --rdp-today-color: #72c2cb;
 }
 
 @layer base {
