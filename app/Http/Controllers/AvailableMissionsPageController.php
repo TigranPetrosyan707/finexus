@@ -101,9 +101,40 @@ class AvailableMissionsPageController extends Controller
         ]);
     }
 
-    public function show(int $id)
+    public function show(Request $request, int $id): Response
     {
-        return Inertia::render('AvailableMissions/MissionDetails', ['id' => $id]);
+        $user = $request->user();
+        $mission = Mission::with('company')->where('status', 'active')->find($id);
+        if (!$mission) {
+            return Inertia::render('AvailableMissions/MissionDetails', [
+                'id' => $id,
+                'mission' => null,
+                'companyMissions' => [],
+            ]);
+        }
+
+        $formatted = $this->formatMission($mission);
+        $appliedMissionIds = ($user->role ?? '') === 'expert'
+            ? HireRequest::where('expert_id', $user->id)->whereIn('status', ['pending', 'accepted'])->pluck('mission_id')
+            : collect();
+        $companyMissions = [];
+        if (($user->role ?? '') === 'expert' && $mission->company_id) {
+            $others = Mission::with('company')
+                ->where('status', 'active')
+                ->where('company_id', $mission->company_id)
+                ->where('id', '!=', $id)
+                ->whereNotIn('id', $appliedMissionIds)
+                ->orderByDesc('posted_date')
+                ->limit(10)
+                ->get();
+            $companyMissions = $others->map(fn (Mission $m) => $this->formatMission($m))->values()->all();
+        }
+
+        return Inertia::render('AvailableMissions/MissionDetails', [
+            'id' => $id,
+            'mission' => $formatted,
+            'companyMissions' => $companyMissions,
+        ]);
     }
 
     private function defaultFilters(): array

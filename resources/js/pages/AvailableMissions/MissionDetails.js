@@ -1,43 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import React from 'react';
+import { router, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { FaEuroSign, FaClock, FaMapMarkerAlt, FaCalendarAlt, FaArrowLeft, FaBriefcase } from 'react-icons/fa';
 import { colors } from '../../constants/colors';
 import Button from '../../components/UI/Button/Button';
 import { formatMissionDate, getSectorOptions } from '../PostMission/utils';
-import { api } from '../../utils/api';
 
 const MissionDetails = ({ id }) => {
   const { t, i18n } = useTranslation();
-  const [mission, setMission] = useState(null);
-  const [companyMissions, setCompanyMissions] = useState([]);
-
-  useEffect(() => {
-    const loadMission = async () => {
-      if (!id) return;
-      try {
-        const [{ data: single }, { data: list }] = await Promise.all([
-          api.get(`/api/available-missions/${id}`),
-          api.get('/api/available-missions'),
-        ]);
-        const foundMission = single || (list || []).find(m => m.id === Number(id));
-        if (foundMission) {
-          setMission(foundMission);
-          const otherMissions = (list || []).filter(
-            m => m.id !== foundMission.id && m.companyId === foundMission.companyId
-          );
-          setCompanyMissions(otherMissions);
-        } else {
-          setMission(null);
-        }
-      } catch (error) {
-        console.error('Error loading mission:', error);
-        setMission(null);
-      }
-    };
-
-    loadMission();
-  }, [id]);
+  const { props } = usePage();
+  const mission = props.mission ?? null;
+  const companyMissions = props.companyMissions ?? [];
 
 
   if (!mission) {
@@ -69,8 +42,8 @@ const MissionDetails = ({ id }) => {
       <div className="relative z-10 container mx-auto px-4 py-8">
         <Button
           onClick={() => router.visit('/available-missions')}
-          variant="secondary"
           className="mb-6 flex items-center space-x-2"
+          style={{ backgroundColor: colors.linkHover, color: '#fff' }}
         >
           <FaArrowLeft className="w-4 h-4" />
           <span>{t('availableMissions.back') || 'Back'}</span>
