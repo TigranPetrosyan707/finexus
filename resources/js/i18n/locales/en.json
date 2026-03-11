@@ -460,6 +460,7 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "openChat": "Open Chat",
+    "chatError": "Unable to open chat",
     "noMissions": "No missions found",
     "noMissionsDescription": "You don't have any missions yet.",
     "unknown": "Unknown",
@@ -571,6 +572,11 @@
     "send": "Send",
     "noMessages": "No messages",
     "noMessagesDescription": "You don't have any messages yet.",
+    "startConversation": "Start the conversation!",
+    "connected": "Connected",
+    "connecting": "Connecting...",
+    "chat": "Chat",
+    "read": "✓✓",
     "lastMessages": {
       "interested": "Hello, I'm interested in your mission...",
       "canStart": "Perfect, I can start on Monday."

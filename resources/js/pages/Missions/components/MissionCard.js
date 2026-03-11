@@ -6,6 +6,7 @@ import Button from '../../../components/UI/Button/Button';
 import RejectModal from './RejectModal';
 import RejectionReasonModal from './RejectionReasonModal';
 import ApplicationRejectModal from './ApplicationRejectModal';
+import ChatModal from '../../Chat/components/ChatModal';
 import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
@@ -13,6 +14,7 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showRejectionReasonModal, setShowRejectionReasonModal] = useState(false);
   const [showApplicationRejectModal, setShowApplicationRejectModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const isHireRequest = assignedMission.isHireRequest;
   const isApplicationRequest = assignedMission.isApplicationRequest;
@@ -121,6 +123,15 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
 
   const getStatusText = (status) => {
     return t(`missions.status.${status}`);
+  };
+
+  const handleOpenChat = async () => {
+    // Check if there's an active assigned mission to chat about
+    if (!assignedMission.missionId) {
+      toast.error(t('missions.chatError') || 'Unable to open chat');
+      return;
+    }
+    setShowChatModal(true);
   };
 
   if (isHireRequest || isApplicationRequest) {
@@ -307,66 +318,81 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
         t={t}
         isLoading={isRejecting}
       />
+      <ChatModal
+        isOpen={showChatModal}
+        onClose={() => setShowChatModal(false)}
+        missionId={assignedMission.missionId}
+        missionTitle={mission?.title}
+        t={t}
+      />
     </>
     );
   }
 
   return (
-    <div className="p-6 rounded-lg border-2 border-gray-200 hover:shadow-lg transition-all">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex-1">
-          <div className="flex items-center space-x-3 mb-2">
-            {getStatusIcon(assignedMission.status)}
-            <h3 className="text-lg font-semibold text-gray-900">{mission.title}</h3>
-            <span 
-              className="px-3 py-1 text-xs rounded-full" 
-              style={{ backgroundColor: `${colors.linkHover}15`, color: colors.linkHover }}
-            >
-              {getStatusText(assignedMission.status)}
-            </span>
+    <>
+      <div className="p-6 rounded-lg border-2 border-gray-200 hover:shadow-lg transition-all">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center space-x-3 mb-2">
+              {getStatusIcon(assignedMission.status)}
+              <h3 className="text-lg font-semibold text-gray-900">{mission.title}</h3>
+              <span 
+                className="px-3 py-1 text-xs rounded-full" 
+                style={{ backgroundColor: `${colors.linkHover}15`, color: colors.linkHover }}
+              >
+                {getStatusText(assignedMission.status)}
+              </span>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-2">
+              {userRole === 'expert' ? (
+                <>
+                  <FaBuilding className="w-3 h-3 inline mr-1" />
+                  {t('missions.company')}: {company?.name || t('missions.unknown')}
+                </>
+              ) : (
+                <>
+                  <FaUser className="w-3 h-3 inline mr-1" />
+                  {t('missions.expert')}: {expert?.name || t('missions.unknown')}
+                </>
+              )}
+            </p>
+            
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <FaEuroSign className="w-4 h-4" />
+                <span>{mission.budget} €</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <FaClock className="w-4 h-4" />
+                <span>{mission.durationDays} {t('missions.days')}</span>
+              </div>
+              {assignedMission.startDate && (
+                <span>{t('missions.startDate')}: {assignedMission.startDate}</span>
+              )}
+              {assignedMission.status === 'completed' && assignedMission.endDate && (
+                <span>{t('missions.endDate')}: {assignedMission.endDate}</span>
+              )}
+            </div>
           </div>
           
-          <p className="text-sm text-gray-600 mb-2">
-            {userRole === 'expert' ? (
-              <>
-                <FaBuilding className="w-3 h-3 inline mr-1" />
-                {t('missions.company')}: {company?.name || t('missions.unknown')}
-              </>
-            ) : (
-              <>
-                <FaUser className="w-3 h-3 inline mr-1" />
-                {t('missions.expert')}: {expert?.name || t('missions.unknown')}
-              </>
-            )}
-          </p>
-          
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-            <div className="flex items-center space-x-2">
-              <FaEuroSign className="w-4 h-4" />
-              <span>{mission.budget.toLocaleString(i18n.language === 'en' ? 'en-US' : 'fr-FR')} €</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <FaClock className="w-4 h-4" />
-              <span>{mission.durationDays} {t('missions.days')}</span>
-            </div>
-            {assignedMission.startDate && (
-              <span>{t('missions.startDate')}: {assignedMission.startDate}</span>
-            )}
-            {assignedMission.status === 'completed' && assignedMission.endDate && (
-              <span>{t('missions.endDate')}: {assignedMission.endDate}</span>
-            )}
-          </div>
+          {assignedMission.status === 'active' && (
+            <Button onClick={handleOpenChat}>
+              {t('missions.openChat')}
+            </Button>
+          )}
         </div>
-        
-        {assignedMission.status === 'active' && (
-          <Button>
-            {t('missions.openChat')}
-          </Button>
-        )}
       </div>
-    </div>
+      <ChatModal
+        isOpen={showChatModal}
+        onClose={() => setShowChatModal(false)}
+        missionId={assignedMission.missionId}
+        missionTitle={mission?.title}
+        t={t}
+      />
+    </>
   );
 };
 
 export default MissionCard;
-
