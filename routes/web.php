@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExpertController;
 use App\Http\Controllers\Api\ExpertProfileController;
 use App\Http\Controllers\Api\HireRequestController;
+use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthPageController;
@@ -77,6 +78,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/invoices/{invoice}', [InvoiceController::class, 'show']);
     Route::put('/api/invoices/{invoice}', [InvoiceController::class, 'update']);
     Route::delete('/api/invoices/{invoice}', [InvoiceController::class, 'destroy']);
+
+    Route::get('/api/documents', [DocumentController::class, 'index']);
+    Route::post('/api/documents', [DocumentController::class, 'store']);
+    Route::get('/api/documents/{document}', [DocumentController::class, 'show']);
+    Route::put('/api/documents/{document}', [DocumentController::class, 'update']);
+    Route::delete('/api/documents/{document}', [DocumentController::class, 'destroy']);
 
     Route::get('/api/dashboard/company-financial', [DashboardController::class, 'companyFinancial']);
     Route::put('/api/dashboard/company-financial', [DashboardController::class, 'updateCompanyFinancial']);

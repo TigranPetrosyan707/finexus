@@ -25,7 +25,7 @@ return new class extends Migration
             $table->unsignedBigInteger('expert_id')->unique();
             $table->unsignedInteger('active_missions')->default(0);
             $table->unsignedInteger('completed_missions')->default(0);
-            $table->unsignedFloat('rating')->default(0);
+            $table->float('rating')->default(0);
             $table->unsignedInteger('available_missions')->default(0);
             $table->decimal('total_earnings', 15, 2)->default(0);
             $table->unsignedInteger('total_hours')->default(0);

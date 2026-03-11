@@ -108,9 +108,19 @@
     "subtitle": "Importez vos fichiers comptables (CSV, Excel, FEC, PDF) pour générer des analyses automatiques",
     "supported": "Fichiers pris en charge",
     "chooseFile": "Choisir un fichier",
-    "uploadDisabled": "Import réel désactivé en mode démo.\nDans la version finale : lecture de vos fichiers CSV / Excel / FEC / PDF.",
     "noDocuments": "Aucun document trouvé",
-    "noDocumentsDescription": "Vous n'avez pas encore importé de documents. Importez vos fichiers comptables pour commencer à les gérer."
+    "noDocumentsDescription": "Vous n'avez pas encore importé de documents. Importez vos fichiers comptables pour commencer à les gérer.",
+    "name": "Nom",
+    "size": "Taille",
+    "date": "Date",
+    "actions": "Actions",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "enterNewName": "Entrez le nouveau nom du document",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce document ? Cette action ne peut pas être annulée.",
+    "uploadSuccess": "Document importé avec succès",
+    "deleteSuccess": "Document supprimé avec succès",
+    "updateSuccess": "Document mis à jour avec succès"
   },
   "account": {
     "title": "Mon compte",
