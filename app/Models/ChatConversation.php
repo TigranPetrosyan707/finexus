@@ -42,7 +42,8 @@ class ChatConversation extends Model
 
     public function messages(): HasMany
     {
-        return $this->hasMany(ChatMessage::class)->orderBy('created_at', 'asc');
+        // chat_messages.conversation_id -> chat_conversations.id
+        return $this->hasMany(ChatMessage::class, 'conversation_id')->orderBy('created_at', 'asc');
     }
 
     public function getOtherParticipant(int $userId): User

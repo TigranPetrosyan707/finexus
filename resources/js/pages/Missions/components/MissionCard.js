@@ -6,7 +6,6 @@ import Button from '../../../components/UI/Button/Button';
 import RejectModal from './RejectModal';
 import RejectionReasonModal from './RejectionReasonModal';
 import ApplicationRejectModal from './ApplicationRejectModal';
-import ChatModal from '../../Chat/components/ChatModal';
 import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
@@ -14,7 +13,6 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showRejectionReasonModal, setShowRejectionReasonModal] = useState(false);
   const [showApplicationRejectModal, setShowApplicationRejectModal] = useState(false);
-  const [showChatModal, setShowChatModal] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const isHireRequest = assignedMission.isHireRequest;
   const isApplicationRequest = assignedMission.isApplicationRequest;
@@ -53,6 +51,10 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
       await api.post(`/api/hire-requests/${assignedMission.hireRequest.id}/accept`);
       toast.success(t('missions.acceptSuccess') || 'Request accepted successfully');
       if (onStatusChange) onStatusChange();
+      // Open messages section right away.
+      if (assignedMission.missionId) {
+        router.visit(`/chat?missionId=${assignedMission.missionId}`);
+      }
     } catch (error) {
       console.error('Error accepting request:', error);
       toast.error(t('missions.rejectError') || 'Failed to accept request');
@@ -92,6 +94,10 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
       await api.post(`/api/hire-requests/${assignedMission.applicationRequest.id}/accept`);
       toast.success(t('missions.acceptApplicationSuccess') || 'Application accepted successfully');
       if (onStatusChange) onStatusChange();
+      // Open messages section right away.
+      if (assignedMission.missionId) {
+        router.visit(`/chat?missionId=${assignedMission.missionId}`);
+      }
     } catch (error) {
       console.error('Error accepting application:', error);
       toast.error(t('missions.acceptApplicationError') || 'Failed to accept application');
@@ -131,7 +137,7 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
       toast.error(t('missions.chatError') || 'Unable to open chat');
       return;
     }
-    setShowChatModal(true);
+    router.visit(`/chat?missionId=${assignedMission.missionId}`);
   };
 
   if (isHireRequest || isApplicationRequest) {
@@ -318,13 +324,6 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
         t={t}
         isLoading={isRejecting}
       />
-      <ChatModal
-        isOpen={showChatModal}
-        onClose={() => setShowChatModal(false)}
-        missionId={assignedMission.missionId}
-        missionTitle={mission?.title}
-        t={t}
-      />
     </>
     );
   }
@@ -384,13 +383,6 @@ const MissionCard = ({ assignedMission, userRole, t, i18n, onStatusChange }) => 
           )}
         </div>
       </div>
-      <ChatModal
-        isOpen={showChatModal}
-        onClose={() => setShowChatModal(false)}
-        missionId={assignedMission.missionId}
-        missionTitle={mission?.title}
-        t={t}
-      />
     </>
   );
 };

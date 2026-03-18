@@ -45,12 +45,9 @@ class ChatMessageSent implements ShouldBroadcast
             'conversationId' => $this->conversation->id,
             'missionId' => $this->conversation->mission_id,
             'missionTitle' => $this->conversation->mission?->title,
-            'sender' => [
-                'id' => $this->message->sender->id,
-                'name' => $this->message->sender->name,
-            ],
             'message' => [
                 'id' => $this->message->id,
+                'senderId' => $this->message->sender_id,
                 'message' => $this->message->message,
                 'isRead' => $this->message->is_read,
                 'createdAt' => $this->message->created_at->toIso8601String(),

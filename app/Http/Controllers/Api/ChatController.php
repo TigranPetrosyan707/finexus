@@ -17,6 +17,9 @@ class ChatController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
         
         $conversations = ChatConversation::where('user_one_id', $user->id)
             ->orWhere('user_two_id', $user->id)
@@ -56,13 +59,16 @@ class ChatController extends Controller
     {
 
         $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
         // Get the mission to find the other participant
         $mission = \App\Models\Mission::findOrFail($missionId);
 
         // Determine the other user based on user role
         $otherUserId = null;
-        if ($user->id === $mission->user_id) {
-            // User is the company - get the assigned expert
+        if ($user->id === $mission->company_id) {
+            // User is the company - get the assigned expert from the active assignment
             $assignedMission = \App\Models\AssignedMission::where('mission_id', $missionId)
                 ->where('status', 'active')
                 ->first();
@@ -70,8 +76,8 @@ class ChatController extends Controller
                 $otherUserId = $assignedMission->expert_id;
             }
         } else {
-            // User is the expert - get the company
-            $otherUserId = $mission->user_id;
+            // User is the expert - the other party is the mission's company
+            $otherUserId = $mission->company_id;
         }
 
         if (!$otherUserId) {
@@ -106,6 +112,9 @@ class ChatController extends Controller
         ]);
 
         $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
         
         $conversation = ChatConversation::where('id', $conversationId)
             ->where(function ($query) use ($user) {
@@ -152,6 +161,9 @@ class ChatController extends Controller
         ]);
 
         $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
         
         $conversation = ChatConversation::where('id', $conversationId)
             ->where(function ($query) use ($user) {
@@ -196,6 +208,9 @@ class ChatController extends Controller
     public function markAsRead(Request $request, int $conversationId): JsonResponse
     {
         $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
         
         $conversation = ChatConversation::where('id', $conversationId)
             ->where(function ($query) use ($user) {

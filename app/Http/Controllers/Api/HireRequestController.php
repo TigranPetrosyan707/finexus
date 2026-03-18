@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChatConversation;
 use App\Models\AssignedMission;
 use App\Models\HireRequest;
 use App\Models\Mission;
@@ -140,6 +141,14 @@ class HireRequestController extends Controller
             'status' => 'active',
             'start_date' => $hire->mission->start_date ?? now(),
         ]);
+
+        // Ensure a chat conversation exists for the mission between both parties.
+        // This allows the chat modal/page to load immediately after acceptance.
+        ChatConversation::findOrCreate(
+            (int) $hire->mission_id,
+            (int) $hire->company_id,
+            (int) $hire->expert_id
+        );
 
         $hire->load(['mission', 'expert', 'company']);
         return response()->json(['data' => $this->format($hire)]);

@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ExpertProfileController;
 use App\Http\Controllers\Api\HireRequestController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthPageController;
 use App\Http\Controllers\AvailableMissionsPageController;
@@ -27,7 +28,13 @@ use App\Http\Controllers\PostMissionPageController;
 use App\Http\Controllers\SearchExpertsPageController;
 use App\Http\Controllers\SubscriptionPageController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+
+// Register broadcasting routes (e.g. `/broadcasting/auth` for Pusher private channels)
+// Use `web` middleware (session/cookies), but don't force `auth` here because
+// we authorize private channels using the `X-User-Id` header fallback as well.
+Broadcast::routes(['middleware' => ['web']]);
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthPageController::class, 'login'])->name('login');
@@ -103,6 +110,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/hire-requests', [HireRequestController::class, 'store']);
     Route::post('/api/hire-requests/{id}/accept', [HireRequestController::class, 'accept']);
     Route::post('/api/hire-requests/{id}/reject', [HireRequestController::class, 'reject']);
+
+    // Chat routes (session-authenticated)
+    Route::get('/api/chat/conversations', [ChatController::class, 'index']);
+    Route::get('/api/chat/conversations/mission/{mission_id}', [ChatController::class, 'getOrCreateConversation']);
+    Route::get('/api/chat/conversations/{conversationId}/messages', [ChatController::class, 'messages']);
+    Route::post('/api/chat/conversations/{conversationId}/messages', [ChatController::class, 'sendMessage']);
+    Route::post('/api/chat/conversations/{conversationId}/read', [ChatController::class, 'markAsRead']);
 
     Route::get('/api/available-missions', [AvailableMissionController::class, 'index']);
     Route::get('/api/available-missions/{id}', [AvailableMissionController::class, 'show']);

@@ -44,4 +44,10 @@ class User extends Authenticatable
             'professional_info' => 'array',
         ];
     }
+
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->email === "admin@admin.admin";
+    }
 }

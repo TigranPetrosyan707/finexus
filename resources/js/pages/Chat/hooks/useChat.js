@@ -72,13 +72,20 @@ export const useChat = (conversationId) => {
           await loadPusher();
         }
         
-        const pusherKey = import.meta.env.VITE_PUSHER_APP_KEY || 'your-pusher-key';
-        const pusherCluster = import.meta.env.VITE_PUSHER_CLUSTER || 'your-cluster';
+        const pusherKey = import.meta.env.VITE_PUSHER_APP_KEY;
+        const pusherCluster = import.meta.env.VITE_PUSHER_CLUSTER;
+
+        if (!pusherKey || !pusherCluster) {
+          console.error(
+            'Pusher config missing. Please set `VITE_PUSHER_APP_KEY` and `VITE_PUSHER_CLUSTER` in your .env and restart Vite.'
+          );
+          return;
+        }
         
         if (!pusherRef.current) {
           pusherRef.current = new window.Pusher(pusherKey, {
             cluster: pusherCluster,
-            authEndpoint: '/api/broadcasting/auth',
+            authEndpoint: '/broadcasting/auth',
             auth: {
               headers: {
                 'X-User-Id': user.id,
