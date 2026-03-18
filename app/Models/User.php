@@ -26,6 +26,12 @@ class User extends Authenticatable
         'manager_info',
         'personal_info',
         'professional_info',
+        'stripe_customer_id',
+        'stripe_payment_method_id',
+        'stripe_payment_brand',
+        'stripe_payment_last4',
+        'stripe_payment_exp_month',
+        'stripe_payment_exp_year',
     ];
 
     protected $hidden = [

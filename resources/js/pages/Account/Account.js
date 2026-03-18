@@ -11,6 +11,7 @@ import CompanyInfoForm from './components/CompanyInfoForm';
 import UserInfo from './components/UserInfo';
 import UserInfoForm from './components/UserInfoForm';
 import PasswordForm from './components/PasswordForm';
+import StripeCardForm from './components/StripeCardForm';
 
 const Account = () => {
   const { t, i18n } = useTranslation();
@@ -121,6 +122,8 @@ const Account = () => {
           isLoading={isUpdatingPassword}
           t={t}
         />
+
+        <StripeCardForm />
       </div>
     </div>
   );

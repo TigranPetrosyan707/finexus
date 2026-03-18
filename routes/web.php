@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountPageController;
 use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\AccountStripeController;
 use App\Http\Controllers\Api\AssignedMissionController;
 use App\Http\Controllers\Api\AvailableMissionController;
 use App\Http\Controllers\Api\DashboardController;
@@ -78,6 +79,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/api/account/password', [AccountController::class, 'updatePassword']);
     Route::put('/api/account/company-info', [AccountController::class, 'updateCompanyInfo']);
     Route::put('/api/account/user-info', [AccountController::class, 'updateUserInfo']);
+
+    // Stripe: save tokenized cards for future off-session usage
+    Route::get('/api/account/stripe/publishable-key', [AccountStripeController::class, 'publishableKey']);
+    Route::post('/api/account/stripe/create-setup-intent', [AccountStripeController::class, 'createSetupIntent']);
+    Route::post('/api/account/stripe/save-card', [AccountStripeController::class, 'saveCard']);
 
     Route::get('/api/invoices', [InvoiceController::class, 'index']);
     Route::post('/api/invoices', [InvoiceController::class, 'store']);

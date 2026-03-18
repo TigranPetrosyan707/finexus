@@ -115,6 +115,14 @@ class AccountController extends Controller
             'managerInfo' => $user->manager_info,
             'personalInfo' => $user->personal_info,
             'professionalInfo' => $user->professional_info,
+            'stripeCustomerId' => $user->stripe_customer_id,
+            'stripePaymentMethod' => [
+                'id' => $user->stripe_payment_method_id,
+                'brand' => $user->stripe_payment_brand,
+                'last4' => $user->stripe_payment_last4,
+                'expMonth' => $user->stripe_payment_exp_month,
+                'expYear' => $user->stripe_payment_exp_year,
+            ],
             'createdAt' => $user->created_at?->toIso8601String(),
         ];
     }

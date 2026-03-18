@@ -164,7 +164,22 @@
     "lastnameRequired": "Le nom est requis",
     "emailRequired": "L'email est requis",
     "emailInvalid": "Adresse email invalide",
-    "phoneRequired": "Le téléphone est requis"
+    "phoneRequired": "Le téléphone est requis",
+    "card": {
+      "title": "Moyen de paiement",
+      "noCard": "Aucune carte enregistrée",
+      "secureSubtitle": "Saisie sécurisée de la carte grâce à Stripe.",
+      "initializing": "Initialisation...",
+      "cardholderName": "Nom du titulaire",
+      "cardholderNamePlaceholder": "Jean Dupont",
+      "saveCard": "Enregistrer la carte",
+      "saving": "Enregistrement...",
+      "savedSuccess": "Carte enregistrée avec succès.",
+      "authRequired": "Une authentification supplémentaire est requise. Veuillez la compléter.",
+      "errors": {
+        "stripeNotReady": "Stripe n'est pas prêt pour le moment."
+      }
+    }
   },
   "payment": {
     "title": "Paiement sécurisé",

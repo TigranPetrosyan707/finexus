@@ -164,7 +164,22 @@
     "lastnameRequired": "Last name is required",
     "emailRequired": "Email is required",
     "emailInvalid": "Invalid email address",
-    "phoneRequired": "Phone is required"
+    "phoneRequired": "Phone is required",
+    "card": {
+      "title": "Payment method",
+      "noCard": "No card saved yet",
+      "secureSubtitle": "Secure card entry powered by Stripe.",
+      "initializing": "Initializing...",
+      "cardholderName": "Cardholder name",
+      "cardholderNamePlaceholder": "Jean Dupont",
+      "saveCard": "Save card",
+      "saving": "Saving...",
+      "savedSuccess": "Card saved successfully.",
+      "authRequired": "Additional authentication required. Please complete it.",
+      "errors": {
+        "stripeNotReady": "Stripe is not ready yet."
+      }
+    }
   },
   "payment": {
     "title": "Secure Payment",
